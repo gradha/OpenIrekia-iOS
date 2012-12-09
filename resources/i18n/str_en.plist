@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<!-- 0 -->
+	<string>Aborting program</string>
+	<string>Warning</string>
+	<string>Abort</string>
+	<string>Ignore</string>
+	<string>Error getting app beacon</string>
+	<!-- 5 -->
+	<string>Invalid app beacon JSON</string>
+	<string>Missing beacon key</string>
+	<string>Error getting app data</string>
+	<string>Invalid app data JSON</string>
+	<string>Error parsing app data 2</string>
+	<!-- 10 -->
+	<string>Error parsing app data 1</string>
+	<string>Couldn't save app data</string>
+	<string>Error opening database</string>
+	<string>Error saving beacon data</string>
+	<string>Connection lost</string>
+	<!-- 15 -->
+	<string>The connection with the server has been lost. The application will still work, but new content won't be available.</string>
+	<string>Connecting to the server...</string>
+	<string>Gallery</string>
+	<string>Previous</string>
+	<string>Next</string>
+	<!-- 20 -->
+	<string>Accept</string>
+	<string>Connection error</string>
+	<string>Error processing data</string>
+	<string>Safari</string>
+	<string>Back</string>
+	<!-- 25 -->
+	<string>Forward</string>
+	<string>Reload</string>
+	<string>Error opening URL</string>
+	<string>%1$@ of %2$@</string>
+	<string>Play video</string>
+	<!-- 30 -->
+	<string>Photo</string>
+	<string>Expand date</string>
+	<string>Compress date</string>
+	<string>Search</string>
+	<string>Cancel</string>
+	<!-- 35 -->
+	<string>Get more...</string>
+	<string>Downloading data</string>
+</array>
+</plist>

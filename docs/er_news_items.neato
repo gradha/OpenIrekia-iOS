@@ -1,0 +1,44 @@
+graph ER {
+	node [shape=box]; Owners;
+
+	node [shape=box]; News_items;
+	node [shape=ellipse]; {node [label="id"] News_items_id; }
+	node [shape=ellipse]; {node [label="owner"] News_items_owner; }
+	node [shape=ellipse]; {node [label="size"] News_items_size; }
+	node [shape=ellipse]; {node [label="data"] News_items_data; }
+
+	News_items -- News_items_id
+	News_items -- News_items_owner
+	News_items -- News_items_size
+	News_items -- News_items_data
+
+	node [shape=box]; News_thumbs;
+	node [shape=ellipse]; {node [label="id"] News_thumbs_id; }
+	node [shape=ellipse]; {node [label="owner"] News_thumbs_owner; }
+	node [shape=ellipse]; {node [label="url"] News_thumbs_url; }
+	node [shape=ellipse]; {node [label="size"] News_thumbs_size; }
+	node [shape=ellipse]; {node [label="data"] News_thumbs_data; }
+
+	News_thumbs -- News_thumbs_id
+	News_thumbs -- News_thumbs_owner
+	News_thumbs -- News_thumbs_url
+	News_thumbs -- News_thumbs_size
+	News_thumbs -- News_thumbs_data
+
+	node [shape=box]; Item_contents;
+	node [shape=ellipse]; {node [label="id"] Item_contents_id; }
+	node [shape=ellipse]; {node [label="owner"] Item_contents_owner; }
+	node [shape=ellipse]; {node [label="url"] Item_contents_url; }
+	node [shape=ellipse]; {node [label="size"] Item_contents_size; }
+	node [shape=ellipse]; {node [label="data"] Item_contents_data; }
+
+	Item_contents -- Item_contents_id
+	Item_contents -- Item_contents_owner
+	Item_contents -- Item_contents_url
+	Item_contents -- Item_contents_size
+	Item_contents -- Item_contents_data
+
+	News_thumbs -- Owners
+	Item_contents -- Owners
+	News_items -- Owners
+}

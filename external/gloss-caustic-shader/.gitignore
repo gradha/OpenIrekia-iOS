@@ -1,0 +1,5 @@
+.DS_Store
+**/*.xcodeproj/TemplateIcon.icns
+**/*.xcodeproj/*.pbxuser
+**/*.xcodeproj/*.perspectivev3
+**/*.xcodeproj/*.mode1v3

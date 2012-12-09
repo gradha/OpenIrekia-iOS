@@ -1,0 +1,250 @@
+=========================
+Floki: Internal db schema
+=========================
+
+:author: Grzegorz Adam Hankiewicz <gradha@argon.sabren.com>
+
+.. contents::
+
+.. section-numbering::
+
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+General
+=======
+
+Information on what files are cached locally and their structure.
+There are two caching mechanisms: plain files and sqlite database.
+The plain text files are used for basic application start up data
+which is never deleted, only updated. The database is for data that
+expires and which can be loaded on demand to speed up application
+start up time.
+
+File caching
+============
+
+Application data information
+----------------------------
+
+Stored in the file 'app_data' in the application documents dictionary,
+the file contains the string received from the server with the
+general app data after having been successfully parsed. This data
+is quickly loaded during app initialization and used straight away.
+If updates happen to this data, the changes will be stored and be
+visible during the next run (unless a user notification protocol
+is established).
+
+
+Application beacon data
+-----------------------
+
+Stored in the file 'beacon_data' in the application documents
+dictionary, the file contains the data received from the server for
+the beacon, just like the other file.
+
+In order to deal with the TTL of the beacon data, the time stamp of
+the cached file is used to know when new network connections have
+to be done.
+
+
+Database caching
+================
+
+Database caching is applied at the basic binary level. Even though
+we know the protocol for news or images, JSON data is stored naively
+as a string to avoid having to deal with protocol changes and
+updating the database structure. Before a tab can cache files, it
+has to register itself in the database with a unique identifier.
+
+When the application starts, it registers the different tab unique
+ids the tabs are potentially going to use. If a tab id is not in
+the ownership table, it has an entry created. If after all tabs are
+created there are entries in the ownership table which have not
+been made active, they will be erased, along with their database
+contents.
+
+
+Database entry point: owners
+----------------------------
+
+Owners table
+++++++++++++
+
+Stores the relationship of network URLs with internal database
+identifiers.
+
+.. figure:: er_owners.neato.svg
+	:align: right
+
+	E/R diagram of Floki's Owner and Sections tables.
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the URL in the database. This identifier will
+	be referenced from all other tables requiring ownership.
+**name** VARCHAR(255):
+	URL of the ownership. This is cosmetic, only for human
+	reference, and is not actually used by the code. Tab
+	identifiers are specified manually in the application
+	protocol.
+**last_updated** INTEGER:
+	Time at which happened the last update of the URL. The value
+	is encoded as the number of seconds since 1970. It's OK if
+	the value is zero, that will surely force an update of the
+	feed.
+
+
+Sections table
+++++++++++++++
+
+Sections are groups for items. They are generic, so they are at the `Owners table`_ level, since both news and gallery elements could be grouped in sections.  
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the URL in the database. This identifier is
+	automatically generated and not visible to the user.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** TEXT:
+	String of JSON data.
+
+
+News related tables
+-------------------
+
+.. figure:: er_news_items.neato.svg
+	:align: right
+
+	E/R diagram of Floki's news related tables
+
+News_items table
+++++++++++++++++
+
+Stores the binary JSON for news elements.
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the item. This identifier matches the one
+	sent by the server.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** TEXT:
+	String of JSON data.
+
+
+News_thumbs table
++++++++++++++++++
+
+News items can have a thumbnail associated with them. If it exists,
+store it in this table. Thumbnails have an additional URL attribute
+which is not used as a key, but rather as a check to see if the
+resource has changed on the server side for the news item.
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the thumb. This identifier matches the one
+	from `News_items table`_.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**url** TEXT NOT NULL:
+	Name of the resource on the server. Used only as check
+	against the server, if the names don't match the cache is
+	invalid.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** BLOB:
+	Binary data for the image.
+
+
+Item_contents table
++++++++++++++++++++
+
+News items can have downloadable content. If they exist and are allowed to be cached, the table will hold them. Pretty similar to `News_thumbs table`_
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the item content. This identifier matches the
+	one from `News_items table`_.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**url** TEXT NOT NULL:
+	Name of the resource on the server. Used only as check
+	against the server, if the names don't match the cache is
+	invalid.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** BLOB:
+	Binary data for the downloadable content. Most likely an
+	HTML or text in UTF8 encoding.
+
+
+Gallery related tables
+----------------------
+
+.. figure:: er_gallery_items.neato.svg
+	:align: right
+
+	E/R diagram of Floki's gallery related tables
+
+Gallery_items table
++++++++++++++++++++
+
+Just like `News_items table`_.
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the item. This identifier matches the one
+	sent by the server.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** TEXT:
+	String of JSON data.
+
+
+Gallery_thumbs table
+++++++++++++++++++++
+
+Just like `News_thumbs table`_.
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the thumb. This identifier matches the one
+	from `Gallery_items table`_.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**url** TEXT NOT NULL:
+	Name of the resource on the server. Used only as check
+	against the server, if the names don't match the cache is
+	invalid.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** BLOB:
+	Binary data for the image.
+
+
+Gallery_images table
+++++++++++++++++++++
+
+Just like `Item_contents table`_
+
+**id** INTEGER PRIMARY KEY:
+	Identifier of the item content. This identifier matches the
+	one from `Gallery_items table`_.
+**owner** INTEGER PRIMARY KEY:
+	Identifier of the tab that has ownership over this entry.
+**url** TEXT NOT NULL:
+	Name of the resource on the server. Used only as check
+	against the server, if the names don't match the cache is
+	invalid.
+**size** INTEGER:
+	Length in bytes of the data. Used to quickly know the size
+	of database.
+**data** BLOB:
+	Binary data for the image.

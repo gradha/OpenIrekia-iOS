@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<!-- 0 -->
+	<string>Abortando programa</string>
+	<string>Aviso</string>
+	<string>Abortar</string>
+	<string>Ignorar</string>
+	<string>Error obteniendo baliza de la aplicación</string>
+	<!-- 5 -->
+	<string>JSON de la baliza de aplicación inválido</string>
+	<string>Falta llave en la baliza</string>
+	<string>Error obteniendo datos de la aplicación</string>
+	<string>JSON de los datos de aplicación invalidos</string>
+	<string>Error procesando datos de aplicación 2</string>
+	<!-- 10 -->
+	<string>Error procesando datos de aplicación 1</string>
+	<string>No se pudo salvar los datos de la aplicación</string>
+	<string>Error abriendo base de datos</string>
+	<string>Error salvando datos de la baliza</string>
+	<string>Conexión perdida</string>
+	<!-- 15 -->
+	<string>Se perdió la conexión con el servidor. La aplicación seguirá funcionando, pero no habrá nuevo contenido disponible.</string>
+	<string>Conectando al servidor...</string>
+	<string>Galería</string>
+	<string>Anterior</string>
+	<string>Siguiente</string>
+	<!-- 20 -->
+	<string>Aceptar</string>
+	<string>Error en la conexión</string>
+	<string>Error procesando datos</string>
+	<string>Safari</string>
+	<string>Atrás</string>
+	<!-- 25 -->
+	<string>Adelante</string>
+	<string>Recargar</string>
+	<string>Error abriendo URL</string>
+	<string>%1$@ de %2$@</string>
+	<string>Reproducir vídeo</string>
+	<!-- 30 -->
+	<string>Foto</string>
+	<string>Expandir fecha</string>
+	<string>Comprimir fecha</string>
+	<string>Buscar</string>
+	<string>Cancelar</string>
+	<!-- 35 -->
+	<string>Obtener más...</string>
+	<string>Bajando datos</string>
+</array>
+</plist>

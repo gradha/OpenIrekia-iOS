@@ -1,0 +1,1846 @@
+=======================
+Floki: Server protocols
+=======================
+
+:author: Grzegorz Adam Hankiewicz <gradha@argon.sabren.com>
+
+.. contents::
+
+.. section-numbering::
+
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+General
+=======
+
+Clients may append or prepend a special number to all server requests
+indicating the client version. This is hardcoded into the URL to
+make it easier to upgrade different client versions at different
+times depending on their feature set. URL example pattern::
+
+	http://server/<appname>/v<number>-app
+
+This could transform into the following URLs::
+
+	http://efaber.net/kusta/v1-app
+	http://efaber.net/irekia/v3-app
+
+These patterns are not enforced by the application. They are
+recommended to be able to use different versions or *skins* of the
+application with mostly the same content behind them.
+
+
+Communication of parameters to the server
+=========================================
+
+There is a basic rudimentary information communication to the server
+about the capabilities of the client. The server can receive any
+URL with the following additional and optional parameters:
+
+**d**:
+	An integer which identifies the device type. The following
+	table is used:
+
+	* 1: iPad type hardware (768x1024)
+	* 2: iPhone 4 type hardware (double resolution, 640x960))
+	* anything else: older iPhone/iPod generation (320x480)
+
+**l**:
+	When a request for a `Protocols`_ service is done, the
+	optional l value indicates the lowest cached identifier now
+	being shown to the user. Ignore values of zero or less.
+
+**h**:
+	When a request for a `Protocols`_ service is done, the
+	optional h value indicates the highest cached identifier now
+	being shown to the user. Ignore values of zero or less.
+
+**o**:
+	When the server sends the has_older_ parameter along items,
+	the user may request older items through a special cell.
+	If the user requests more items, the client will form a new
+	URL with this parameter specifying the id of the last element
+	currently shown to the user (the one with the lowest
+	sort_id_), so as to let the server know from which element
+	**id** should the older items come back in the results of
+	the query.
+
+Example URLs::
+
+	http://s1.irekia.efaber.net/data/upv02.jpg?d=2
+	http://s1.irekia.efaber.net/mob_app/newses?l=3105&h=3143
+	http://s1.irekia.efaber.net/site/about?format=floki&d=1
+	http://s1.irekia.efaber.net/tara/gossips&o=797
+
+
+Application definition protocol
+===============================
+
+Describes how the application works, the URLs it has to fetch, and
+other look details to customize it for the client. This is fetched
+once by the user from the net and later updated. To avoid initial
+downloads the data can be embedded inside the application directly.
+For the case of net updates, the package can be encrypted/signed
+to prevent malicious user from subverting clients.
+
+The actual data is separated in two packages: first an app version
+indicator, which is fetched by clients unconditionally to check for
+updates. The payload of the version indicator will be an URL and
+version number for the real data. The separation is done to optimize
+bandwidth and avoid relying on the server's file time stamp.
+
+
+Version indicator
+-----------------
+
+Example URL for the file::
+
+	http://efaber.net/irekia/v1-app
+
+Contents of the payload:
+
+	|	{"v_": number, "url_": string, "|ttl1|_": number}
+
+.. _v:
+
+**v**:
+	Any positive integer. Clients will fetch always the payload
+	pointed at by URL if the number is bigger than their current
+	version.  All clients start with version 0 when there is
+	no payload. If the payload was previously embedded, a
+	hardcoded version could be specified to avoid re-fetching
+	the same data.
+
+.. _url:
+
+**url**:
+	Address of the real payload for the application definition,
+	which will be cached locally.
+
+.. |ttl1| replace:: ttl
+.. _ttl1:
+
+**ttl**:
+	Time to live in seconds for the cache of this indicator
+	file. You can specify here values like 24 * 60 * 60 to force
+	daily updates. You can put here a big number (like 2^31)
+	to force an application with no updates. Recommended value
+	of 12 * 60 * 60.
+
+
+General app data
+----------------
+
+Example URL for the file::
+
+	http://efaber.net/irekia/v1-appdata
+
+Contents of the payload. If these are received by the client, they
+will be cached forever. If you need to change something here, modify
+the "v" number in the payload of the version indicator file fetched
+by all clients at TTL intervals:
+
+	|	{"tabs": [
+	|		{"long_title_": string_id_,
+	|		"short_title_": string_id_,
+	|		"class_type_": string,
+	|		"tab_image_": string,
+	|		"unique_id_": int32,
+	|		"data_: {...}
+	|		},
+	|		<repeat block for each tab>,
+	|		],
+	|	"langs": [
+	|		{"langcode_": {[
+	|			"1": string, "2": string, ...]}},
+	|		<repeat langcode for each available language>,
+	|		],
+	|	"misc": {
+	|		"delete_disk_cache_": [string, ...],
+	|		"slash_scaled_images_": [string, ...]
+	|		}
+	|	}
+
+.. _string_id:
+
+**string_id**:
+	Integer pointing to a number stored in langs/langcode/x,
+	allowing i18n.
+
+.. _long_title:
+
+**long_title**:
+	The string that will appear on the top of the tab for the
+	user to know where is she in the navigation of content.
+
+.. _short_title:
+
+**short_title** (optional):
+	Optionally the string identifier for a shorter version of
+	the title that fits better in the small space allocated for
+	the tab. If not available, the long_title will be used
+	instead.
+
+.. _class_type:
+
+**class_type**:
+	String with the name of the class that will be used to
+	represent the content of the tab. Available classes are:
+
+	* Gallery_view_controller_
+	* News_view_controller_
+	* Web_view_controller_
+
+.. _tab_image:
+
+**tab_image** (optional):
+	String with embedded base64 version of a file. If not
+	present, no image will be used for the tab. Remember that
+	in terms of space, you should be providing a PNG whose alpha
+	value is used to make pixel transparent, and all others are
+	opaque. Monochrome images work best for size.
+
+.. _unique_id:
+
+**unique_id**
+	Positive number that has to be unique through all other
+	tabs in the application. This integer will be used internally
+	for things like the disk cache to maintain cache independence
+	between tabs, or to locate and communicate tabs.
+
+	If a tab doesn't have an unique identifier or it is being
+	repeated, the application will crash.
+
+.. _data:
+
+**data**:
+	Additional structure data for the class initialization,
+	which is dependant on the type.
+
+.. _langcode:
+
+**langcode**:
+	ISO 649-1 or 649-2 code string representing language. See
+	http://www.loc.gov/standards/iso639-2/php/code_list.php.
+	Examples of this would be "es", "en", "eu", etc.
+
+.. _delete_disk_cache:
+
+**delete_disk_cache** (optional):
+	This is a list of UDID strings. If your device UDID matches
+	one of the strings in this list, the global preferences
+	option that says "Flush on next run" will be turned on.
+	This means that for the time being the application will
+	cache stuff, but the next time you enter the application
+	it will be purged. Note that this only changes the application
+	setting. You can still exit the application, go to preferences
+	and *disable* the disk cache flush on your next application
+	run if you want to preserve the cache.
+
+	UDID strings are long ASCII strings like
+	``9928be88a0c19c357e2aa1a9d6d42fed4f1302ab``. However, there
+	is a special string you can use too, and that is ``simulator``.
+	If the application finds this string and it is not running
+	on one of the known Apple platforms, the cache will also
+	be purged on restart.
+
+.. _slash_scaled_images:
+
+**slash_scaled_images** (optional):
+	This is a list of UDID strings. If your device UDID matches
+	one of the strings in this list, all scaled images will be
+	overwritten with a red slash. The purpose is to verify
+	visually if there are places in the application where images
+	are being scaled.  Image scaling does cost CPU time on the
+	device, and also hints at places where the server could be
+	optimizing the network bandwidth.
+
+	Use the special string ``simulator`` as UDID if you are not
+	running on a real portable device to activate this feature.
+
+	Note that not all places were scaled images are used get
+	the slash, only where the performance may be more sensitive,
+	like images for table cells.
+
+Both tabs and langs are sequence sensitive. Tabs are generated in
+the application from left to right in order of appearance. The
+language codes inside "langs" are also significative. The first
+language will be considered to be the master language, whose strings
+are always loaded. This is required because additional languages
+might not provide all string translations.
+
+String translations appearing in secondary languages but not in the
+master language are discarded. Implementation detail: strings are
+stored in a contiguous array. Therefore, for efficiency you want
+the string identifiers to be as tightly packed as possible. Empty
+numbers will be represented as nil pointers.
+
+Also, URLs that the application will fetch for content will have
+the langcode appended. This means that the internationalization of
+the client is closely related to that of the content downloaded.
+
+
+Special string identifiers
+++++++++++++++++++++++++++
+
+While you can use any identifier for the strings in your applications,
+there are some reserved numbers that mean special global texts for
+the application. They are specified in the global application either
+because they are one-off messages or they are repeated through all
+items of the application and that would waste a lot of space.
+
+The numbers of the reserved identifiers start at 10000 and have the
+following meaning:
+
+10000:
+	String for the news sharing title. The string is shown on
+	the top of the action sheet presented to the user when she
+	taps on the top right corner to share a news item.
+
+	If nothing is specified, the hardcoded string ``Share this
+	news...`` will be used.
+10001:
+	String for the image sharing title. The string is shown on
+	the top of the action sheet presented to the user when she
+	taps on the top right corner to share a picture item.
+
+	If nothing is specified, the hardcoded string ``Share this
+	picture...`` will be used.
+10002:
+	String for the action sheet button used to copy the address
+	of the shared item to the clipboard.
+
+	If nothing is specified, the hardcoded string ``Copy address``
+	will be used.
+10003:
+	String for the action sheet button used to send an email
+	with the shared item's URL.
+
+	If nothing is specified, the hardcoded string ``Send email``
+	will be used.
+10004:
+	String for word used to cancel any action.
+
+	If nothing is specified, the hardcoded string ``Cancel``
+	will be used.
+10005:
+	String for the email subject when sharing news items by
+	email. This string can have text substitution, see `Email
+	text substitution`_.
+
+	If nothing is specified, the hardcoded string ``<TITLE>``
+	will be used.
+10006:
+	Like 10005 but for picture items instead of news items.
+10007:
+	String for the email body when sharing news items by email.
+	This string can have text substitution, see `Email text
+	substitution`_, and is expected to be in HTML. This means
+	that you can embed URLs and stuff like that.
+
+	If nothing is specified, the hardcoded string
+	``<A HREF="<URL>"><URL></A>`` will be used.
+10008:
+	Like 10007 but for picture items instead of news items.
+10009:
+	This is a variant of 10008. It is a string for the email
+	body when sharing pictures by email which have a description.
+	This is different from 10008 because you might want to
+	format the text in a different way. Also, if you used the
+	PHOTO_DESC tag in 10008, it would be replaced with the empty
+	string, and that doesn't look good.
+
+	If nothing is specified, the hardcoded string
+	``<A HREF="<URL>"><PHOTO_DESC></A>`` will be used.
+10010:
+	String for the movie sharing title. The string is shown on
+	the top of the action sheet presented to the user when she
+	taps on the top right corner to share a movie item.
+
+	If nothing is specified, the hardcoded string ``Share this
+	movie...`` will be used.
+10011:
+	String for the email subject when sharing movie items by
+	email. This string can have text substitution, see `Email
+	text substitution`_.
+
+	If nothing is specified, the hardcoded string ``<TITLE>``
+	will be used.
+10012:
+	String for the email body when sharing movie items by email.
+	This string can have text substitution, see `Email text
+	substitution`_, and is expected to be in HTML. This means
+	that you can embed URLs and stuff like that.
+
+	If nothing is specified, the hardcoded string
+	``<A HREF="<URL>"><URL></A>`` will be used.
+10013:
+	String for the twitter action button when the user is shown
+	the sharing options.
+
+	If nothing is specified, the hardcoded string ``Twitter``
+	will be used.
+10014:
+	String for the facebook action button when the user is shown
+	the sharing options.
+
+	If nothing is specified, the hardcoded string ``Facebook``
+	will be used.
+10015:
+	When the iPad launches and there is no article selected, a
+	blank view greets the user. This view contains a message
+	telling the user to navigate through the sections to select
+	an item.
+
+	If nothing is specified, the hardcoded string ``Browse the
+	sections and select an item`` will be used.
+10016:
+	The iPad features a special button which in portrait mode
+	invokes a popover with the available sections. This message
+	allows you to change the text on the button.
+
+	As a special case if you specify the empty string as the
+	text for this string, the button's text will be dynamic and
+	set to the current tab bar title of the selected index. For
+	the situations when no item is selected, the first tab's
+	title is used.
+
+	If nothing is specified, the hardcoded string ``Sections``
+	will be used, meaning the button will have a static nature.
+
+
+.. _News_view_controller:
+
+News_view_controller class data
++++++++++++++++++++++++++++++++
+
+These are attributes that define the working of a tab managed by
+the class News_view_controller:
+
+	|	"data": {
+	|		"|main_url1|_": string,
+	|		"|row_height1|_": int32,
+	|		"|padding1|_": int32,
+	|		"image_alignment_": int32,
+	|		"image_size_": [int32, int32],
+	|		"|title_lines1|_": int32,
+	|		"|title_size1|_": int32,
+	|		"|title_color1|_": color_triplet_,
+	|		"|text_size1|_": int32,
+	|		"|text_color1|_": color_triplet_,
+	|		"footer_size_": int32,
+	|		"footer_color_": color_triplet_,
+	|		"footer_alignment_": int32,
+	|		"|back_normal_color1|_": color_triplet_,
+	|		"back_highlight_color_": color_triplet_,
+	|		"|cache_size1|_": int32,
+	|		"|ttl2|_": int32,
+	|		"|download_if_virgin1|_": bool,
+	|		"|allow_manual_reload1|_": bool,
+	|		"item_disclosure_": string,
+	|		"navigation_changes_section_": bool,
+	|		"section_title_padding_": int32,
+	|		"section_collapsed_text_color_": color_triplet_,
+	|		"section_expanded_text_color_": color_triplet_,
+	|		"section_collapsed_back_color_": color_triplet_,
+	|		"section_expanded_back_color_": color_triplet_,
+	|		"search_bar_": string,
+	|		"more_items_url_": string,
+	|		"tags_regex_": [string, ...],
+	|		"tags_url_": [string, ...],
+	|		"videos_regex_": [string, ...],
+	|		"videos_url_": [string, ...]
+	|		}
+
+.. |main_url1| replace:: main_url
+.. _main_url1:
+
+**main_url**:
+	The address that will be polled for new items. This URL
+	won't be used directly, UI langcode will be appended.
+	Examples:
+
+	==========================     ==========================
+	``http://floki/news``          ``http://floki/newseu``
+	``http://floki/news/``         ``http://floki/news/eu``
+	``http://floki/news.html``     ``http://floki/news.htmleu``
+	==========================     ==========================
+
+	See `News item protocol`_ for information on the structure of
+	the data expected by the class.
+
+	Finally, note that if you are embedding the data package
+	as a recursive item of the `News item protocol`_, the
+	main_url attribute will be overwritten by the url attribute
+	of the parent item, so in these situations you can ignore
+	setting the value, as it will be discarded.
+
+.. |row_height1| replace:: row_height
+.. _row_height1:
+
+**row_height** (optional):
+	Height of each item in pixels. By default 44.
+
+.. |padding1| replace:: padding
+.. _padding1:
+
+**padding** (optional):
+	Padding in pixels between the borders of the cell and
+	content. By default it is 3 pixels.
+
+.. _image_alignment:
+
+**image_alignment** (optional):
+	This is an integer but there are really only two possible
+	values. When the value is zero, the thumbnail images align
+	to the left of the cell. When the value is one, the thumbnail
+	images align to the right of the cell. All other possible
+	values are discarded at the moment. By default this is zero
+	(left image alignment).
+
+.. _image_size:
+
+**image_size** (optional):
+	Pair of two integers, specifying the size. By default images
+	will be drawn to 30 pixels of width and the total height
+	of the row minus padding.
+
+.. |title_lines1| replace:: title_lines
+.. _title_lines1:
+
+**title_lines** (optional):
+	Integer with the number of lines used in the cell for the
+	title. By default 1, which is the minimum.
+
+.. |title_size1| replace:: title_size
+.. _title_size1:
+
+**title_size** (optional):
+	Integer with size of the font. By default 16.
+
+.. |title_color1| replace:: title_color
+.. _title_color1:
+
+**title_color** (optional):
+	RGB triplet with the font color. By default blue.
+
+.. _color_triplet:
+
+**color_triplet**:
+	A color triplet is just an array of three integers, each
+	ranging from 0 to 255 inclusive. Their order specifies the
+	red, green and blue color components of the color.
+
+.. |text_size1| replace:: text_size
+.. _text_size1:
+
+**text_size** (optional):
+	Integer with the size of the main text font. By default 13.
+
+.. |text_color1| replace:: text_color
+.. _text_color1:
+
+**text_color** (optional):
+	RGB triplet with the font color. By default black.
+
+.. _footer_size:
+
+**footer_size** (optional):
+	Integer with the size of the cell footer. By default 11.
+	Note that footers *eat* space from the bottom of cell. This
+	means that text and images will be pushed up, reducing their
+	available space.
+
+.. _footer_color:
+
+**footer_color** (optional):
+	RGB triplet with the footer color. By default gray.
+
+.. _footer_alignment:
+
+**footer_alignment** (optional):
+	Footers can be left aligned, centered or right aligned if
+	their content doesn't overflow the width of the cell (in
+	which case they would be truncated). A negative value will
+	align the footer to the left. A value of zero will center
+	the footer. A positive value will align the footer to the
+	right. By default this is zero (centered footer).
+
+.. |back_normal_color1| replace:: back_normal_color
+.. _back_normal_color1:
+
+**back_normal_color** (optional):
+	RGB triplet with the background color of the cells. By default white.
+
+.. _back_highlight_color:
+
+**back_highlight_color** (optional):
+	RGB triplet with the highlight color of the cells. By default blue.
+
+.. |cache_size1| replace:: cache_size
+.. _cache_size1:
+
+**cache_size** (optional):
+	Number of items to cache for this view. By default 50. Note
+	that if the server offers more than these elements for a
+	request, the extra elements won't be saved. Also, this value
+	is the effective number of entries that will be shown to
+	the user, even if the feed contains more elements.
+
+.. |ttl2| replace:: ttl
+.. _ttl2:
+
+**ttl** (optional):
+	Positive integer, specifies how many seconds have to elapse
+	for the view to request a content refresh since the last
+	content fetch. By default 300.
+
+.. |download_if_virgin1| replace:: download_if_virgin
+.. _download_if_virgin1:
+
+**download_if_virgin** (optional):
+	If true, the view will always request a content refresh to
+	the server once the cached items have been loaded, regardless
+	of TTL. By default false. This check happens once when the
+	view is shown for the first time in the whole application
+	run.
+
+.. |allow_manual_reload1| replace:: allow_manual_reload
+.. _allow_manual_reload1:
+
+**allow_manual_reload** (optional):
+	If set to true, the view will show in the top of the
+	navigation bar a button with a curled arrow that lets the
+	user force refreshing the content from the server. By default no.
+
+.. _item_disclosure:
+
+**item_disclosure** (optional):
+	Base64 graphic used for the item disclosure button. If no
+	graphic is present, the default one from the bundle will
+	be used.
+
+.. _navigation_changes_section:
+
+**navigation_changes_section** (optional):
+	By default switching news items up and down using the
+	navigation buttons is restricted to elements within the
+	same section. However, if you set this variable to true,
+	the user will seamlessly switch from one section to another
+	as if they didn't exist.
+
+.. _section_title_padding:
+
+**section_title_padding** (optional):
+	Amount of pixels used to pad the section text when measured
+	on a 320 pixel wide display. The default for this value is
+	ten pixels. The padding is applied only to the left and
+	right sides of the section header.
+
+.. _section_collapsed_text_color:
+
+**section_collapsed_text_color** (optional):
+	Color for the section header text when the section is
+	collapsed. By default this is black (0, 0, 0).
+
+.. _section_expanded_text_color:
+
+**section_expanded_text_color** (optional):
+	Color for the section header text when the section is
+	expanded. By default this is white (255, 255, 255).
+
+.. _section_collapsed_back_color:
+
+**section_collapsed_back_color** (optional):
+	Color for the section header background when the section is
+	collapsed. By default this is gray (126, 127, 127).
+
+.. _section_expanded_back_color:
+
+**section_expanded_back_color** (optional):
+	Color for the section header background when the section is
+	expanded. By default this is bluish (114, 149, 219).
+
+.. _search_bar:
+
+**search_bar** (optional):
+	News tabs can have a search bar displayed on top of their
+	list. The user types some words in to the search bar and
+	pressing return starts a network request against the server
+	with the entered terms. The **search_bar** parameter specifies
+	the correct search URL that will be used to make the network
+	query. The server is expected to return a list of news
+	items. The returned items are expected to be *children* of
+	the current tab, but you can force a different parent
+	controller in the returned elements through the optional
+	parent_id_ parameter.
+
+	If this parameter is present and valid, the search bar
+	appears always at the top of the list. The URL you specify
+	in this parameter requires some parameter substitution for
+	it to be valid (see `Search URL substitution`_). If the URL
+	doesn't contain the minimum parameters it will be discarded.
+	Here's a valid example::
+
+		http://efaber.net/_LNG_/search?q=_WORDS_&page=_PAGE_
+
+	The view which will show the search results won't cache the
+	list of results, and therefore has no limit of items
+	displayed. The items themselves will be cached, though,
+	once the user touches them.
+
+.. _more_items_url:
+
+**more_items_url** (optional):
+	News and gallery tabs display content based on identifiers.
+	More recent items have higher id_ numbers, and the server
+	only provides a handful. If the server allows traversing
+	the feed into the past (people from the past also have
+	rights, you know), the controller has to specify the format
+	URL which will be queried for more items of the same type::
+
+		http://efaber.net/_LNG_/kpop?more_items
+
+	Just like the search_bar_, the URL will replace the _LNG_
+	substring by the currently used language. But wait, where are
+	the params? How does the server know what items have to be
+	returned? This is known through the `Communication of parameters
+	to the server`_ feature which will convert the previous URL
+	into the following more likely example::
+
+		http://efaber.net/eu/kpop?more_items&d=2&l=450&h=633
+
+	By extracting the **l** parameter of the URL, the server
+	knows what elements the client has and therefore what is
+	to be sent. If the **l** parameter is not present in the
+	query, it has to return an empty set or a server HTTP error
+	(like one of 5xx or 4xx). Note that the server is not
+	required to have a **?more_items** param, it only has to
+	be a different URL from |main_url1|_.
+
+.. _tags_regex:
+
+**tags_regex** (optional):
+	When the user touches a link inside web content, before
+	going to the URL, the application matches the link against
+	a set of regular expressions registered by all news
+	controllers. If any of those expressions match, the link
+	is instead opened with a new duplicate of the controller
+	which captured the link. The **tags_regex** parameter
+	specifies an array of regular expressions to match and
+	capture. The found links will be opened as a paginated tag
+	search using the first captured group as tag input. Example::
+
+		"tags_regex": [
+			"http://www.irekia.euskadi.net/.*tags/([^?]+)[?]type=News",
+			"http://mirekia.euskadi.net/.*tags/([^?]+)[?]type=News"]
+
+	In this example, two kind of URL patterns will be captured
+	as tag links and opened with the news view controller which
+	specified those patterns. The format of the regular expressions
+	is the ICU syntax, documented at
+	http://regexkit.sourceforge.net/RegexKitLite/#ICUSyntax.
+	You will need to escape JSON characters. Some characters
+	like the dot practically don't need escaping. Other characters
+	characters like the question mark need escaping, for instance,
+	putting them inside a range.
+
+	If a pattern is invalid or somehow doesn't work, it will
+	be silently ignored, though log messages may be generated
+	in debug builds during app initialization to help trace the
+	problem. The regular expression is expected to have a single
+	group. Additional matching groups are discarded. Log messages
+	will indicate what part of the URL was extracted.
+
+.. _tags_url:
+
+**tags_url** (optional):
+	While the tags_regex_ parameter specifies how links are
+	captured, the **tags_url** parameter specifies how the
+	captured tags will be processed by the controller. The
+	format of the URL is the same as for search_bar_.
+
+.. _videos_regex:
+
+**videos_regex** (optional):
+	Exactly just like tags_regex_, the user may touch a link
+	which points to a video. The difference here is that the
+	video URL is expected to return a single video element in
+	the typical array of `News item protocol`_ (additional
+	elements will be ignored). Other than that it works pretty
+	much the same.
+
+.. _videos_url:
+
+**videos_url** (optional):
+	Pair version of tags_url_ for videos_regex_. Unlike tags_url_,
+	here the text substitution of the URL won't require the
+	**_PAGE_** substring to be present. Still, the **_WORDS_**
+	substring is required and will be replaced with whatever
+	videos_regex_ did capture in the original URL (see `Search
+	URL substitution`_).
+
+
+.. _Item_view_controller:
+
+Item_view_controller class data
+*******************************
+
+This controller is invoked from the News_view_controller_, and it
+handles the showing of the individual news items. It's the default
+controller for the entries of the `News item protocol`_. This entry
+exists only for completeness, you rarely need to do anything manual
+with this class.
+
+
+.. _Web_view_controller:
+
+Web_view_controller class data
+++++++++++++++++++++++++++++++
+
+These are attributes that define the working of a tab managed by
+the class Web_view_controller:
+
+	|	"data": {
+	|		"|main_url2|_": string,
+	|		"scales_page_to_fit_": bool
+	|		}
+
+.. |main_url2| replace:: main_url
+.. _main_url2:
+
+**main_url**:
+	The address that will be polled for new items. This URL
+	won't be used directly, UI langcode will be appended. See
+	`News_view_controller class data`_ for examples.
+
+.. _scales_page_to_fit:
+
+**scales_page_to_fit** (optional):
+	Allow the pages to scale. By default false.
+
+
+.. _Gallery_view_controller:
+
+Gallery_view_controller class data
+++++++++++++++++++++++++++++++++++
+
+These are attributes that define the working of a tab managed by
+the class Gallery_view_controller:
+
+	|	"data": {
+	|		"|main_url3|_": string,
+	|		"|row_height2|_": int32,
+	|		"cells_per_row_": int32,
+	|		"|padding2|_": int32,
+	|		"cell_normal_color_": color_triplet,
+	|		"cell_highlight_color_": color_triplet,
+	|		"|cache_size2|_": int32,
+	|		"|ttl3|_": int32,
+	|		"|download_if_virgin2|_": bool,
+	|		"|allow_manual_reload2|_": bool,
+	|		"stretch_images_": bool,
+	|		"more_items_url_": string,
+	|		"gallery_regex_": [string, ...],
+	|		"gallery_url_": [string, ...]
+	|		}
+
+.. |main_url3| replace:: main_url
+.. _main_url3:
+
+**main_url**:
+	The address that will be polled for new items. This URL
+	won't be used directly, UI langcode will be appended. See
+	examples of these URLs in the `News_view_controller class
+	data`_ section and additional usage notes. See `Gallery
+	item protocol`_ for information on the structure of the
+	data expected by the class.
+
+.. |row_height2| replace:: row_height
+.. _row_height2:
+
+**row_height** (optional):
+	Height of each row in pixels. By default 79.
+
+.. _cells_per_row:
+
+**cells_per_row** (optional):
+	Number of maximum images on each row. By default 4. The
+	size of each thumbnail is calculated according to the
+	row_height, number of cells per row and padding. See below.
+
+.. |padding2| replace:: padding
+.. _padding2:
+
+**padding** (optional):
+	Padding in pixels between the borders of the cell and
+	content, and also between images of the same row. By default
+	it is 2 pixels.
+
+.. _cell_normal_color:
+
+**cell_normal_color** (optional):
+	RGB triplet with the background color of the cells. By default white.
+
+.. _cell_highlight_color:
+
+**cell_highlight_color** (optional):
+	RGB triplet with the highlight color of the cells. The
+	highlight color will be drawn over the image at 50% opacity.
+	By default black.
+
+.. |cache_size2| replace:: cache_size
+.. _cache_size2:
+
+**cache_size** (optional):
+	Number of items to cache for this view. By default 50. Note
+	that if the server offers more than these elements for a
+	request, the extra elements won't be saved. Also, this value
+	is the effective number of entries that will be shown to
+	the user, even if the feed contains more elements.
+
+.. |ttl3| replace:: ttl
+.. _ttl3:
+
+**ttl** (optional):
+	Positive integer, specifies how many seconds have to elapse
+	for the view to request a content refresh since the last
+	content fetch. By default 300.
+
+.. |download_if_virgin2| replace:: download_if_virgin
+.. _download_if_virgin2:
+
+**download_if_virgin** (optional):
+	If true, the view will always request a content refresh to
+	the server once the cached items have been loaded, regardless
+	of TTL. By default false. This check happens once when the
+	view is shown for the first time in the whole application
+	run.
+
+.. |allow_manual_reload2| replace:: allow_manual_reload
+.. _allow_manual_reload2:
+
+**allow_manual_reload** (optional):
+	If set to true, the view will show in the top of the
+	navigation bar a button with a curled arrow that lets the
+	user force refreshing the content from the server. By default no.
+
+.. _stretch_images:
+
+**stretch_images** (optional):
+	If set to true, the thumbnails will be stretched to fill
+	completely their size. If set to false, the thumbnail image
+	will be scaled proportionally to the area. By default set
+	to yes.
+
+.. _gallery_regex:
+
+**gallery_regex** (optional):
+	Just like videos_regex_ but expects the URL to return a
+	JSON with a group of photo elements following the `Gallery
+	item protocol`_. The pagination/older mechanisms will be
+	ignored, the server is expected to return all available
+	photo items in one go.
+
+.. _gallery_url:
+
+**gallery_url** (optional):
+	Pair version of videos_url_ for gallery_regex_.
+
+The vertical size of the thumbnails is easy to work out: it is the
+size of the row height minus two times the padding size. For the
+default row, this means that images are 75 pixels tall.
+
+For the horizontal axis, the width of the thumbnail is calculated
+according to the number of padded images that fit inside the row's
+usable width (320 pixels) minus two times the padding. For instance,
+if you wanted six images in the row with three pixels of padding,
+that would be::
+
+	320 - (3 * 2) - (x + 3 * 2) * 6 = 0
+		or
+	x = (320 - 3 * 2) / 6 - 2 * 3
+		or
+	cell_width = (320 - 2 * padding) / cells_per_row - 2 * padding
+
+Note that the sizes have to be integers. The cell_width value is
+calculated as a floating point but then floored to an integer. For
+the case above, that means that instead of using 46.3 pixels per
+cell, we would use 46, and that will leave 8 pixels extra padding
+for the whole row.
+
+The extra padding is not used to separate the image cells. Instead,
+it is divided by two, floored to an integer, and added to the left
+of the row, leaving the remainder of the padding to the right side
+of the row.
+
+It is recommended that you don't use thumbnail image stretching at
+all and generate the thumbnails in such a way that no screen space
+is wasted. The default thumbnails are square, and most images are
+not. If you have thumbnail areas of 75x75 pixels and an image of
+320x200, don't scale the image to a thumbnail of 75x47 pixels,
+leaving empty space above/below. Instead, center crop the image to
+200x200 and then scale it to 75x75. This is what the iPod's stock
+gallery does, and it works pretty well for most images.
+
+
+.. _Photo_view_controller:
+
+Photo_view_controller class data
+********************************
+
+This controller is invoked from the Gallery_view_controller_, and
+it handles the showing of the individual pictures. It's the default
+controller for the entries of the `Gallery item protocol`_. This
+entry exists only for completeness, you rarely need to do anything
+manual with this class.
+
+
+Preferences_view_controller class data
+++++++++++++++++++++++++++++++++++++++
+
+**NOT IMPLEMENTED**
+
+The preferences tab of the application allows to perform some simple
+generic system operations. This tab is nearly a replica of the
+system settings of the application, and can be embedded in the
+application for those clueless users who don't know where the
+settings are.
+
+**NOT IMPLEMENTED**
+
+These are attributes that define the working of a tab managed by
+the class Preferences_view_controller::
+
+	"data": {
+		"language_position": int32,
+		"cache_info_position": int32,
+		"clear_cache_position": int32,
+		"text_position": int32,
+		"text_string": string_id
+		}
+
+**language_position**:
+	Specifies with a positive integer the sorting order of the
+	option on the screen. If the value is zero or negative, the
+	option won't show up to the user. This option allows the
+	user to change the preferred language of the application
+	between automatic and the ones provided by the application
+	protocol.
+	**NOT IMPLEMENTED**
+**cache_info_position**:
+	Specifies with a positive integer the sorting order of the
+	cell on the screen. If the value is zero or negative, the
+	cell won't show up to the user. This cell is interaction less
+	and merely shows the size of the disk cache, updated in
+	real time.
+	**NOT IMPLEMENTED**
+**clear_cache_position**:
+	Specifies with a positive integer the sorting order of the
+	button on the screen. If the value is zero or negative, the
+	button won't show up to the user. This button will purge
+	the disk cache for everything, app information included.
+	**NOT IMPLEMENTED**
+**text_position** (optional):
+	If present, specifies with a positive integer the sorting
+	order of a chunk of text on the screen. This text will
+	appear centered, and can be multiline.
+	**NOT IMPLEMENTED**
+**text_string** (optional):
+	Identifier of the multiline text string that can be shown
+	on the screen between, before, or after other options.
+	**NOT IMPLEMENTED**
+
+Both the language and clear cache options empty the cache and require
+the user to exit and reenter the application. The difference is
+that the language option modifies a system setting, and it doesn't
+remove the application specification cache, only content cache. On
+the other hand, clear cache simply deletes the cache file for it
+to be recreated. Before exitting the application the user is prompted
+with a confirmation question to avoid input mistakes.
+
+Specifying the same position for different settings will crash the
+application. The actual numbers are meaningless, you can use values
+like 100, 200, 300. The only important thing is that they don't
+repeat and are positive.
+
+
+.. _Movie_view_controller:
+
+Movie_view_controller class data
+++++++++++++++++++++++++++++++++
+
+If you want to show a picture to the user, you feed the `Gallery
+item protocol`_ to a Gallery_view_controller_. But news items and
+pictures are *simple* compared to movies.  Due to the size of the
+device, movies are always played back at full screen and already
+take up space for the interface to control the film. They are also
+potentially bandwidth demanding, so if a user touched by mistake
+a video, and that started a huge transfer, it could be bad.
+
+The Movie_view_controller class is a *facade* that sits between an
+index entry and the actual film allowing the user to decide to watch
+or not video based on further detail information and improved preview
+picture. The *facade* page will show the big preview picture, a
+cell button to view the movie and the title description later.
+Unless the *autoload* parameter is false, the play button will be
+automatically pressed and change into a wait animation.
+
+These are attributes that define the working of a tab managed by
+the class Movie_view_controller:
+
+	|	"data": {
+	|		"|main_url4|_": string,
+	|		"progressive_file_": string,
+	|		"preview_url_": string,
+	|		"preview_width_": int32,
+	|		"preview_height_": int32,
+	|		"padding_": int32,
+	|		"title_": string,
+	|		"title_id_": string_id,
+	|		"|title_lines2|_": int32,
+	|		"|title_size2|_": int32,
+	|		"|title_color2|_": color_triplet_,
+	|		"text_": string,
+	|		"text_id_": string_id,
+	|		"|text_size2|_": int32,
+	|		"|text_color2|_": color_triplet_,
+	|		"playback_color_": color_triplet_,
+	|		"|back_normal_color2|_": color_triplet_,
+	|		"autoload_": bool
+	|		}
+
+.. |main_url4| replace:: main_url
+.. _main_url4:
+
+**main_url**:
+	The address that will be used to load a movie. Note that
+	since you are more likely to use the Movie_view_controller
+	from a `News item protocol`_ rather than as a standalone
+	tab, you would not need to specify this URL since the parent
+	item will specify it. More detail in the `News_view_controller
+	class data`_ section.
+
+	This url should point to an m3u8 file with information about
+	an HTTP stream for iOS devices. For a non HTTP stream use
+	progressive_file_.
+
+.. _progressive_file:
+
+**progressive_file** (optional):
+	This address is an alternative version of |main_url4|_ for
+	those devices not supporting iOS HTTP streaming. It should
+	be a progressive enabled mp4 file, meaning that it will be
+	played back as it is being downloaded.
+
+	If you don't specify this attribute and a device needs this
+	value, the |main_url4|_ address will be used after going
+	through a little transformation process:
+
+	* The string **/ts/** will be replaced by **/html5/**.
+	* The string **m3u8** will be replaced by **m4v**.
+
+	The following example |main_url4|_:
+
+		http://efaber.net/video/ts/roly-poly.m3u8
+
+	...will therefore become:
+
+		http://efaber.net/video/html5/roly-poly.m4v
+
+	If the url pattern after the transformation doesn't satisfy
+	you, you will have to specify it manually.
+
+.. _preview_url:
+
+**preview_url** (optional):
+	Address of a big poster image for the user to see with more
+	detail what the video contains.
+
+	You can specify here a relative path to the preview URL
+	with regards to *main_url*.  However, you are likely
+	to have multiple servers handle different media content and
+	the preview URL picture may be on a different server, thus
+	requiring an absolute URL.
+
+.. _preview_width:
+
+**preview_width** (optional):
+	Width that the poster image will be stretched to. The minimum
+	value is 30, the maximum (and default) value is 285 for
+	iPhone devices and 450 for iPad devices.
+
+.. _preview_height:
+
+**preview_height** (optional):
+	Height that the poster image will be stretched to. The
+	minimum value is 30, the maximum (and default) value is
+	160 for iPhone devices and 400 for iPad devices.
+
+.. _padding:
+
+**padding** (optional):
+	Padding in pixels between the borders of the cell and
+	content. By default it is 3 pixels.
+
+.. _title:
+
+**title** (optional):
+	The title that will be shown. By default no title, or
+	inherited from the parent protocol entry.
+
+.. _title_id:
+
+**title_id** (optional):
+	If there is no *title* attribute, the title_id should point
+	to an i18n string. You want to use this only if you are
+	setting up the controller class for a tab where content
+	language has not been decided yet.
+
+.. |title_lines2| replace:: title_lines
+.. _title_lines2:
+
+**title_lines** (optional):
+	Integer with the number of lines used in the text cell for
+	the title. By default 10, which should be enough to avoid
+	title truncation. You may want to set this to 1 or 2 to
+	force truncation.
+
+.. |title_size2| replace:: title_size
+.. _title_size2:
+
+**title_size** (optional):
+	Integer with size of the font. By default 16.
+
+.. |title_color2| replace:: title_color
+.. _title_color2:
+
+**title_color** (optional):
+	RGB triplet with the font color. By default blue.
+
+.. _text:
+
+**text** (optional):
+	The text that will be shown. By default no text, or
+	inherited from the parent protocol entry.
+
+.. _text_id:
+
+**text_id** (optional):
+	If there is no *text* attribute, the text_id should point
+	to an i18n string. You want to use this only if you are
+	setting up the controller class for a tab where content
+	language has not been decided yet.
+
+.. |text_size2| replace:: text_size
+.. _text_size2:
+
+**text_size** (optional):
+	Integer with the size of the main text font. By default 13.
+
+.. |text_color2| replace:: text_color
+.. _text_color2:
+
+**text_color** (optional):
+	RGB triplet with the font color. By default black.
+
+.. _playback_color:
+
+**playback_color** (optional):
+	RGB triplet for the background color of the video button
+	cell which will be shown when the user touches the cell to
+	play back the video. By default light gray.
+
+.. |back_normal_color2| replace:: back_normal_color
+.. _back_normal_color2:
+
+**back_normal_color** (optional):
+	RGB triplet with the background color of the cells. By default white.
+
+.. _autoload:
+
+**autoload** (optional):
+	By default set to true. This means that as soon as the
+	*facade* movie controller view is displayed, the movie will
+	be loaded and played back. If you set this to no, the user
+	will have to explicitly tap on the "Play back video" button.
+
+
+Protocols
+=========
+
+News item protocol
+------------------
+
+This section describes the protocol of the data retrieved by the
+`News_view_controller class data`_ as specified in the main_url
+parameter. News items are really just preview-headers that point
+to pre-generated downloadable HTML content that will be loaded by
+the client. Note that there is no **langs** element like in `General
+app data`_ because this content is already presumed to be localized
+to the user's interface according to the URL it was downloaded from:
+
+	|	{"items": [
+	|		{"id_": int32,
+	|		"parent_id_": int32 | string,
+	|		"sort_id_": int64,
+	|		"section_ids_": [int32, ...],
+	|		"|title2|_": string,
+	|		"|url2|_": string,
+	|		"image_": string,
+	|		"expiration_date_": int32,
+	|		"share_url_": string,
+	|		"online_": bool,
+	|		"body_": string,
+	|		"footer_": string,
+	|		"|class_type2|_": string,
+	|		"|data2|_": {...}
+	|		},
+	|		<repeat block for each item>,
+	|		],
+	|	"to_delete_": [int32, int32, int32],
+	|	"sections_": ...,
+	|	"has_older_": bool
+	|	}
+
+.. _id:
+
+**id**:
+	Identifier of the news element, required to be a positive
+	integer. A stream of new items shouldn't have identifiers
+	repeated. That would be madness, so they will likely be
+	discarded.
+
+.. _parent_id:
+
+**parent_id** (optional):
+	**NOT IMPLEMENTED**
+
+	Most of the time items are simply children of whatever tab
+	they appear in. However, if you want to provide a search_bar_
+	with results for multiple controllers, you may need to
+	specify the controller the item is child of.
+
+	Note that you can use a string to refer to a controller's
+	name or its identifier. If the parent controller is not
+	found, the item will likely be eaten by a grue.
+
+.. _sort_id:
+
+**sort_id** (optional):
+	A positive 64bit integer value which will be used for
+	sorting. Items for the user will be sorted according to
+	this value, higher values will appear on top. If the attribute
+	doesn't exist, the sort_id will be set to the id.
+
+.. _section_ids:
+
+**section_ids** (optional):
+	Array of positive integers specifying what sections this
+	item belongs to. By default the value of the attribute is
+	the empty list. Therefore the item won't show up on any
+	section if the server specifies any. See `Section parameters`_
+	for more details.
+
+.. |title2| replace:: title
+.. _title2:
+
+**title**:
+	String of text that will be shown for the title. The title
+	will be truncated if it doesn't fit horizontally, but it
+	can be multiline depending on the attributes of the parent.
+
+.. |url2| replace:: url
+.. _url2:
+
+**url** (optional):
+	URL to the webcontent that will be shown to the user if she
+	presses the cell. If not present, the cell won't show a
+	disclosure indicator and won't react to the user's touch.
+
+.. _image:
+
+**image** (optional):
+	URL to the image of the cell if available. The path can be
+	relative to the main_url parameter, or absolute. If the
+	field is not present, no image will be shown and the text
+	won't be indented. If the field is present, first the default
+	image placeholder will be displayed, and later the image
+	itself or the default error image if there is any problem
+	with it.
+
+.. _expiration_date:
+
+**expiration_date** (optional):
+	If this value is present and greater than zero, it represents
+	the automatic expiration date of an item. Think of it as
+	an automatic time related *to_delete* tag attached to
+	individual content entries.
+	The expiration date is stored as the number of seconds
+	elapsed since the epoch. If the current device's clock is
+	greater than this date, the element will expire while
+	processing the cache or retrieving items from the server.
+
+.. _share_url:
+
+**share_url** (optional):
+	URL to the content of the item on the *real* web. If this
+	attribute is present, the view will show an action button
+	on the top right corner to allow people copy this shared
+	URL to the clipboard or share it through email.
+	The address you put here has to be an absolute URL, because
+	it will be seen out of the context of the application.
+
+.. _online:
+
+**online** (optional):
+	Boolean, by default false. If true, prevents the content
+	from being cached and will always be reloaded, even if the
+	user dismisses the view and tries to watch it again after
+	a second.
+
+	Note that if an item has online set to false, and
+	is cached by a client, setting this to true in the server
+	won't delete the local cache, only ignore it. If you really
+	need to remove traces of possibly cached content, you need
+	to delete the item and generate a new one with caching
+	turned off since the beginning.
+
+.. _body:
+
+**body**:
+	Multiline text that will be shown below the title. Think
+	of users viewing the cell in landscape view to define the
+	size of this string.
+
+.. _footer:
+
+**footer** (optional):
+	Single string of text that will be shown at the bottom of
+	the cell. You can pass the empty string if you want to force
+	a homogeneous look for your whole table even if some cells
+	don't have a footer.
+
+.. |class_type2| replace:: class_type
+.. _class_type2:
+
+**class_type** (optional):
+	String with the name of the class that will be used to
+	handle the URL. The following are available:
+
+	* Item_view_controller_ (this is the default)
+	* Gallery_view_controller_
+	* News_view_controller_
+	* Web_view_controller_
+	* Movie_view_controller_
+
+	Item_view_controller_ will open the expected pre-generated HTML
+	served to the client. However, with this attribute you can
+	nest different types of content to be opened with other non
+	default classes. Nested content will use the data attribute
+	which is expected to contain the same set of attributes as
+	one of the tab definitions.
+
+.. |data2| replace:: data
+.. _data2:
+
+**data** (optional):
+	If you are using a *class_type* other than the default
+	value, use this attribute to pack the parameters required
+	for the sub controller. See the documentation of the
+	controller for the parameters required here.
+
+.. _to_delete:
+
+**to_delete** (optional):
+	List of identifiers that are forced to be deleted. Before
+	showing anything to the user, news are filtered against
+	this list, even from the disk cache. It only makes sense
+	to provide identifiers as old as cache_size items allowed
+	for the tab, since older entries will expire anyway from
+	the view during the next successful content fetch.
+
+.. _sections:
+
+**sections** (optional):
+	Optional block of attributes related to sectioning the
+	items. See `Section parameters`_ for further information.
+
+.. _has_older:
+
+**has_older** (optional):
+	If this optional parameter is present and set to YES (by
+	default it is set to NO), the controller will understand
+	that older items may be retrieved from the feed. Older items
+	are requested to the server using the **o** parameter. See
+	`Communication of parameters to the server`_ for examples.
+
+When the user presses a cell with URL parameter, a new web view is
+shown with the loading activity indicator. When the content is
+fetched, it is cached locally and displayed. If the displayed HTML
+requires external resources, they can be absolute or relative, but
+they won't be cached. For images, better specify the alt/width/height
+attributes so that the web view can allocate the space in the first
+render.
+
+
+Gallery item protocol
+---------------------
+
+This protocol is based on the `News item protocol`_, so only new
+or different things will be explained. The data provided by this
+protocol are the images to be shown by a Gallery_view_controller_:
+
+	|	{"thumbs": [
+	|		{"id_": int32,
+	|		"sort_id_": int64,
+	|		"section_ids_": int32,
+	|		"|title3|_": string,
+	|		"|url3|_": string,
+	|		"|image2|_": string,
+	|		"expiration_date_": int32,
+	|		"share_url_": string,
+	|		"online_": bool,
+	|		"width_": int32,
+	|		"height_": int32,
+	|		"max_zoom_": float,
+	|		"caption_text_": string,
+	|		"|class_type3|_": string,
+	|		"|data3|_": {...}
+	|		},
+	|		<repeat block for each item>,
+	|		],
+	|	"to_delete_": [int32, int32, int32],
+	|	"sections_": ...,
+	|	"has_older_": bool
+	|	}
+
+.. |title3| replace:: title
+.. _title3:
+
+**title** (optional):
+	Images can have a title. The title will be displayed on top
+	of the view on a translucent HUD, which fades in/out when
+	the user touches the screen. If you specify the empty string,
+	the caption area won't appear.
+
+.. |url3| replace:: url
+.. _url3:
+
+**url**:
+	URL to the full image. Absolute or relative.
+
+.. |image2| replace:: image
+.. _image2:
+
+**image**:
+	URL to the thumbnail. Absolute or relative.
+
+.. _width:
+
+**width**:
+	Size in pixels of the full version of the image. Even if
+	you are using a special recursive value in *class_type* you
+	have to specify this attribute.
+
+.. _height:
+
+**height**:
+	Size in pixels of the full version of the image. Even if
+	you are using a special recursive value in *class_type* you
+	have to specify this attribute.
+
+.. _max_zoom:
+
+**max_zoom** (optional):
+	By default a photo is always centered and scaled to the
+	size of the device. And the user can double tap it to zoom
+	in. This attribute specifies how much zoom in is performed
+	on the double tap. By default is 2, which means doubling
+	the image (regardless of its physical size). The minimum
+	value for this attribute is 1, which is what you would set
+	to disable zooming altogether.
+
+	Depending on the type of images you show, you might want
+	to increase or decrease this value. For instance, if you
+	want to show panoramic images (4:2 or 5:2) you might want
+	to increase the value to let the user zoom in closer than
+	the default, which may otherwise leave black bands above/below
+	the zoomed content and not get close enough.
+
+.. _caption_text:
+
+**caption_text** (optional):
+	Photos can have a caption text. Set this string to the text
+	that you want displayed on top of the picture when the user
+	touches the screen to show the HUD. If you don't specify
+	anything, the caption area won't appear.
+
+.. |class_type3| replace:: class_type
+.. _class_type3:
+
+**class_type** (optional):
+	String with the name of the class that will be used to
+	handle the URL. The following are available:
+
+	* Photo_view_controller_ (this is the default)
+	* Gallery_view_controller_
+	* News_view_controller_
+	* Web_view_controller_
+	* Movie_view_controller_
+
+	Photo_view_controller_ will open the expected image served
+	to the client. However, with this attribute you can nest
+	different types of content to be opened with other non
+	default classes. Nested content will use the data attribute
+	which is expected to contain the same set of attributes as
+	one of the tab definitions.
+
+.. |data3| replace:: data
+.. _data3:
+
+**data** (optional):
+	If you are using a *class_type* other than the default
+	value, use this attribute to pack the parameters required
+	for the sub controller. See the documentation of the
+	controller for the parameters required here.
+
+Please note that while you can potentially feed images of any size
+to the iPhone, the SDK restricts images to be of 1024x1024 size,
+which is the biggest that can fit in the device's texture unit.
+Trying to go beyond this size will likely crash the application
+without warning.
+
+
+Section parameters
+------------------
+
+Definition
+++++++++++
+
+Both the `News item protocol`_ and the `Gallery item protocol`_
+allow an optional sections_ block of tags. This common tag specifies
+how elements are to be grouped visually using the section_ids_
+attribute of each element, which is optional.  Sections themselves
+are just logical grouping elements, but they can optionally show
+an interactive header to show/hide its contents.
+
+If the news or gallery feed doesn't contain a sections_ block, the
+section_ids_ attributes of the items are ignored, since they can't
+be used. In this situation, the table of items will be shown as a
+plain list.
+
+However, if the sections_ tag exists, **no item will be shown**
+unless it has a section_ids_ attribute with valid existing positive
+integers. In short, if you take a normal feed without section_ids_
+attributes and create a sections_ tag, your items will vanish,
+because they won't associate to any section.  This means that once
+you add sections to a feed, everything has to fall into a section,
+or won't be visible to the user, even if it exists and is stored
+to disk cache.
+
+When you have an interactive section, one which allows itself to
+be collapsed or expanded, the starts_collapsed_ attribute is only
+respected the first time the list is populated, even if the server
+changes the value during the next network fetch, it won't affect
+the user until the application is restarted (or a memory warning
+unloads the tab and the user returns to it).
+
+	|	sections: [{
+	|		"|id2|_": int32,
+	|		"sort_id_": int64,
+	|		"visible_": bool,
+	|		"name_": string,
+	|		"interactive_": bool,
+	|		"starts_collapsed_": bool,
+	|		"autocollapse_others_": bool,
+	|		"hide_if_empty_": bool,
+	|		"show_count_": bool,
+	|		"collapsed_text_color_": color_triplet_,
+	|		"collapsed_back_color_": color_triplet_,
+	|		"expanded_text_color_": color_triplet_,
+	|		"expanded_back_color_": color_triplet_
+	|		},
+	|		<repeat block for each section>,
+	|		]
+
+.. |id2| replace:: id
+.. _id2:
+
+**id**:
+	Positive integer associated to the section. This is the
+	number items will refer to with their section_ids_ attributes.
+	If two sections contain the same identifier, only the first
+	one will be show to the user, duplicated sections are
+	discarded.
+
+.. _visible:
+
+**visible**:
+	Boolean that tells if the section's header is visible. If
+	the section is not visible, the content will be shown without
+	a header. If the section is visible, the header will be
+	displayed. Invisible sections ignore all the other parameters
+	related to interaction. By default all sections are visible.
+
+.. _name:
+
+**name** (optional):
+	String of text for the section. This is shown to the user
+	if the section is visible.
+
+.. _interactive:
+
+**interactive** (optional):
+	Boolean allowing the section to be collapsed or expanded
+	by the user tapping on the section header. This attribute
+	is ignored if the section is not visible_. By default all
+	sections are interactive.
+
+.. _starts_collapsed:
+
+**starts_collapsed** (optional):
+	Boolean that specifies if the section starts collapsed or
+	not. The attribute is ignored if the section is not visible_
+	or not interactive_, since an initially collapsed but not
+	interactive section would prevent the user to see its
+	contents. By default yes.
+
+.. _autocollapse_others:
+
+**autocollapse_others** (optional):
+	When you expand an interactive section, other interactive
+	sections can automatically collapse to avoid having a very
+	long table in the interface. By default this variable is
+	set to true. Setting this to false will expand the touched
+	section without collapsing other possibly expanded sections.
+
+.. _hide_if_empty:
+
+**hide_if_empty** (optional):
+	**NOT IMPLEMENTED**
+
+	Controls whether a visible section should show up even when
+	it has no associated items. By default this variable is
+	true. Set it to false if you want the user to see the empty
+	section header. If an interactive section is empty, expanding
+	it will display a basic non interactive cell saying "*Hey,
+	we are empty, come back later!*":
+
+.. _show_count:
+
+**show_count** (optional):
+	By default this attribute is set to false. If you set it
+	to true, each section name will be appended the string
+	" (%d)" showing the number of items related to the section.
+	The count is appended always to the name regardless of
+	section state.
+
+.. _collapsed_text_color:
+
+**collapsed_text_color** (optional):
+	Color for the section header text when the section is
+	collapsed. By default this inherits whatever color you
+	specified in section_collapsed_text_color_.
+
+.. _expanded_text_color:
+
+**expanded_text_color** (optional):
+	Color for the section header text when the section is
+	expanded. By default this inherits whatever color you
+	specified in section_expanded_text_color_.
+
+.. _collapsed_back_color:
+
+**collapsed_back_color** (optional):
+	Color for the section header background when the section is
+	collapsed. By default this inherits whatever color you
+	specified in section_collapsed_back_color_.
+
+.. _expanded_back_color:
+
+**expanded_back_color** (optional):
+	Color for the section header background when the section is
+	expanded. By default this inherits whatever color you
+	specified in section_expanded_back_color_.
+
+
+Disk cache behaviour
+++++++++++++++++++++
+
+There are no parameters in the protocols or application definition
+to specify the amount of cached sections. What happens with them?
+The sections are cached as long as there are items referencing them,
+or the server explicitly requests them to show up even if empty.
+
+
+
+Text substitutions
+==================
+
+Email text substitution
+-----------------------
+
+When sending email, the subject and body of the email can have
+special strings which will be replaced by content from the application.
+They are:
+
+<TITLE>:
+	This string will be replaced by the title used for the item
+	entry.
+<URL>:
+	This string will be replaced by the shared URL attribute
+	for the item entry.
+<PHOTO_DESC>:
+	This string will be replaced by the caption_text attribute
+	of the `Gallery item protocol`_. Since this attribute is
+	optional, if not preset the tag will be replaced by the
+	empty string.
+
+
+Search URL substitution
+-----------------------
+
+As specified by the news tab search_bar_ parameter, for the URL to
+work it needs to have parts of itself replaced. These are the
+substrings you can use:
+
+_LNG_:
+	This optional substring will be replaced by the language
+	langcode of the user. If it is not present nothing happens.
+_WORDS_:
+	The part of the URL where words will be embedded. Mandatory.
+	The text will be replaced by the urlencoded version of the
+	user input. If this tag is not found in the search_bar_
+	parameter, the whole URL will be ignored.
+_PAGE_:
+	The part of the URL specifying the results page. The search
+	is expected to return results in chunks. The page requests
+	start with 1, and the client will never ask for page **N**
+	without requesting previously **N - 1**. If this tag is not
+	found in the search_bar_ parameter, the whole URL will be
+	ignored. This replacement substring is ignored and not
+	required for other similar parameters like videos_url_ or
+	gallery_url which dont't feature paging.
+
+The client doesn't care about the size of each page returned by the search URL,
+so the server is free to return any number of results for each page. As long as
+the server returns anything, the client will keep displaying a cell to request
+more. If the server returns an empty set, the client will presume there are no
+more pages.
+
+
+Debug switches
+==============
+
+There are several debug switches that are available on internal builds which
+may help developing the application. These are:
+
+**Host**:
+	To avoid having many binaries, the internal debug version
+	allows changing the server it fetches data from through a
+	simple list. This also allows easy checking of backwards
+	compatibility against previous already deployed applications.
+	Pick the server you want and don't look back!

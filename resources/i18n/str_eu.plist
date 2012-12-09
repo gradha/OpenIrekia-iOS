@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<!-- 0 -->
+	<string>Programa abortatzen</string>
+	<string>Oharra</string>
+	<string>Abortatu</string>
+	<string>Baztertu</string>
+	<string>Errorea aplikazioaren baliza jasotzen</string>
+	<!-- 5 -->
+	<string>Aplikaziorako JSON baliza okerra da</string>
+	<string>Balizaren gako bat falta da</string>
+	<string>Errorea aplikazioaren datuak jasotzen</string>
+	<string>Aplikaziorako JSON datuak okerrak dira</string>
+	<string>Errorea aplikazioaren datuak jasotzen 2</string>
+	<!-- 10 -->
+	<string>Errorea aplikazioaren datuak prozesatzen 1</string>
+	<string>Ezin izan dira datuak aplikazioan gorde</string>
+	<string>Errorea datu basea irekitzen</string>
+	<string>Errorea baliza gordetzen</string>
+	<string>Konekzioa galduta</string>
+	<!-- 15 -->
+	<string>Konekzioa zerbitzariarekin galdu egin da. Aplikazioa erabiltzen jarrai dezakezu, baina eduki berririk ez da egongo.</string>
+	<string>Zerbitzarira konektatzen...</string>
+	<string>Fototeka</string>
+	<string>Aurrekoa</string>
+	<string>Hurrengoa</string>
+	<!-- 20 -->
+	<string>Ados</string>
+	<string>Errorea konekzionan</string>
+	<string>Errorea datuak prozesatzen</string>
+	<string>Safari</string>
+	<string>Atzera</string>
+	<!-- 25 -->
+	<string>Aurrera</string>
+	<string>Birkargatu</string>
+	<string>Errorea URLa irekitzean</string>
+	<string>%2$@tik %1$@</string>
+	<string>Bideoa erreproduzitu</string>
+	<!-- 30 -->
+	<string>Argazkia</string>
+	<string>Data zabaldu</string>
+	<string>Data konprimitu</string>
+	<string>Bilatu</string>
+	<string>Ezabatu</string>
+	<!-- 35 -->
+	<string>Gehiago jaso...</string>
+	<string>Datuak jasotzen</string>
+</array>
+</plist>

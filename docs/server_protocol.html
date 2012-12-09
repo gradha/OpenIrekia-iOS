@@ -1,0 +1,2013 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>Irekia Mobile Client: Server protocols</title>
+<meta name="author" content="Grzegorz Adam Hankiewicz &lt;gradha&#64;argon.sabren.com&gt;" />
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="floki-server-protocols">
+<h1 class="title">Irekia Mobile Client: Server protocols</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name"></th>
+<td></td></tr>
+</tbody>
+</table>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#general" id="id1">1&nbsp;&nbsp;&nbsp;General</a></li>
+<li><a class="reference internal" href="#communication-of-parameters-to-the-server" id="id3">2&nbsp;&nbsp;&nbsp;Communication of parameters to the server</a></li>
+<li><a class="reference internal" href="#application-definition-protocol" id="id4">3&nbsp;&nbsp;&nbsp;Application definition protocol</a><ul class="auto-toc">
+<li><a class="reference internal" href="#version-indicator" id="id5">3.1&nbsp;&nbsp;&nbsp;Version indicator</a></li>
+<li><a class="reference internal" href="#general-app-data" id="id6">3.2&nbsp;&nbsp;&nbsp;General app data</a><ul class="auto-toc">
+<li><a class="reference internal" href="#special-string-identifiers" id="id7">3.2.1&nbsp;&nbsp;&nbsp;Special string identifiers</a></li>
+<li><a class="reference internal" href="#news-view-controller-class-data" id="id8">3.2.2&nbsp;&nbsp;&nbsp;News_view_controller class data</a><ul class="auto-toc">
+<li><a class="reference internal" href="#item-view-controller-class-data" id="id9">3.2.2.1&nbsp;&nbsp;&nbsp;Item_view_controller class data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#web-view-controller-class-data" id="id10">3.2.3&nbsp;&nbsp;&nbsp;Web_view_controller class data</a></li>
+<li><a class="reference internal" href="#gallery-view-controller-class-data" id="id11">3.2.4&nbsp;&nbsp;&nbsp;Gallery_view_controller class data</a><ul class="auto-toc">
+<li><a class="reference internal" href="#photo-view-controller-class-data" id="id12">3.2.4.1&nbsp;&nbsp;&nbsp;Photo_view_controller class data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#preferences-view-controller-class-data" id="id13">3.2.5&nbsp;&nbsp;&nbsp;Preferences_view_controller class data</a></li>
+<li><a class="reference internal" href="#movie-view-controller-class-data" id="id14">3.2.6&nbsp;&nbsp;&nbsp;Movie_view_controller class data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#protocols" id="id15">4&nbsp;&nbsp;&nbsp;Protocols</a><ul class="auto-toc">
+<li><a class="reference internal" href="#news-item-protocol" id="id16">4.1&nbsp;&nbsp;&nbsp;News item protocol</a></li>
+<li><a class="reference internal" href="#gallery-item-protocol" id="id17">4.2&nbsp;&nbsp;&nbsp;Gallery item protocol</a></li>
+<li><a class="reference internal" href="#section-parameters" id="id18">4.3&nbsp;&nbsp;&nbsp;Section parameters</a><ul class="auto-toc">
+<li><a class="reference internal" href="#definition" id="id19">4.3.1&nbsp;&nbsp;&nbsp;Definition</a></li>
+<li><a class="reference internal" href="#disk-cache-behaviour" id="id20">4.3.2&nbsp;&nbsp;&nbsp;Disk cache behaviour</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#text-substitutions" id="id21">5&nbsp;&nbsp;&nbsp;Text substitutions</a><ul class="auto-toc">
+<li><a class="reference internal" href="#email-text-substitution" id="id22">5.1&nbsp;&nbsp;&nbsp;Email text substitution</a></li>
+<li><a class="reference internal" href="#search-url-substitution" id="id23">5.2&nbsp;&nbsp;&nbsp;Search URL substitution</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#debug-switches" id="id24">6&nbsp;&nbsp;&nbsp;Debug switches</a></li>
+</ul>
+</div>
+<div class="section" id="general">
+<h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;General</a></h1>
+<p>Clients may append or prepend a special number to all server requests
+indicating the client version. This is hardcoded into the URL to
+make it easier to upgrade different client versions at different
+times depending on their feature set. URL example pattern:</p>
+<pre class="literal-block">
+http://server/&lt;appname&gt;/v&lt;number&gt;-app
+</pre>
+<p>This could transform into the following URLs:</p>
+<pre class="literal-block">
+http://efaber.net/kusta/v1-app
+http://efaber.net/irekia/v3-app
+</pre>
+<p>These patterns are not enforced by the application. They are
+recommended to be able to use different versions or <em>skins</em> of the
+application with mostly the same content behind them.</p>
+</div>
+<div class="section" id="communication-of-parameters-to-the-server">
+<h1><a class="toc-backref" href="#id3">2&nbsp;&nbsp;&nbsp;Communication of parameters to the server</a></h1>
+<p>There is a basic rudimentary information communication to the server
+about the capabilities of the client. The server can receive any
+URL with the following additional and optional parameters:</p>
+<dl class="docutils">
+<dt><strong>d</strong>:</dt>
+<dd><p class="first">An integer which identifies the device type. The following
+table is used:</p>
+<ul class="last simple">
+<li>1: iPad type hardware (768x1024)</li>
+<li>2: iPhone 4 type hardware (double resolution, 640x960))</li>
+<li>anything else: older iPhone/iPod generation (320x480)</li>
+</ul>
+</dd>
+<dt><strong>l</strong>:</dt>
+<dd>When a request for a <a class="reference internal" href="#protocols">Protocols</a> service is done, the
+optional l value indicates the lowest cached identifier now
+being shown to the user. Ignore values of zero or less.</dd>
+<dt><strong>h</strong>:</dt>
+<dd>When a request for a <a class="reference internal" href="#protocols">Protocols</a> service is done, the
+optional h value indicates the highest cached identifier now
+being shown to the user. Ignore values of zero or less.</dd>
+<dt><strong>o</strong>:</dt>
+<dd>When the server sends the <a class="reference internal" href="#has-older">has_older</a> parameter along items,
+the user may request older items through a special cell.
+If the user requests more items, the client will form a new
+URL with this parameter specifying the id of the last element
+currently shown to the user (the one with the lowest
+<a class="reference internal" href="#sort-id">sort_id</a>), so as to let the server know from which element
+<strong>id</strong> should the older items come back in the results of
+the query.</dd>
+</dl>
+<p>Example URLs:</p>
+<pre class="literal-block">
+http://s1.irekia.efaber.net/data/upv02.jpg?d=2
+http://s1.irekia.efaber.net/mob_app/newses?l=3105&amp;h=3143
+http://s1.irekia.efaber.net/site/about?format=floki&amp;d=1
+http://s1.irekia.efaber.net/tara/gossips&amp;o=797
+</pre>
+</div>
+<div class="section" id="application-definition-protocol">
+<h1><a class="toc-backref" href="#id4">3&nbsp;&nbsp;&nbsp;Application definition protocol</a></h1>
+<p>Describes how the application works, the URLs it has to fetch, and
+other look details to customize it for the client. This is fetched
+once by the user from the net and later updated. To avoid initial
+downloads the data can be embedded inside the application directly.
+For the case of net updates, the package can be encrypted/signed
+to prevent malicious user from subverting clients.</p>
+<p>The actual data is separated in two packages: first an app version
+indicator, which is fetched by clients unconditionally to check for
+updates. The payload of the version indicator will be an URL and
+version number for the real data. The separation is done to optimize
+bandwidth and avoid relying on the server's file time stamp.</p>
+<div class="section" id="version-indicator">
+<h2><a class="toc-backref" href="#id5">3.1&nbsp;&nbsp;&nbsp;Version indicator</a></h2>
+<p>Example URL for the file:</p>
+<pre class="literal-block">
+http://efaber.net/irekia/v1-app
+</pre>
+<p>Contents of the payload:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">{&quot;<a class="reference internal" href="#v">v</a>&quot;: number, &quot;<a class="reference internal" href="#url">url</a>&quot;: string, &quot;<a class="reference internal" href="#ttl1">ttl</a>&quot;: number}</div>
+</div>
+</blockquote>
+<dl class="docutils" id="v">
+<dt><strong>v</strong>:</dt>
+<dd>Any positive integer. Clients will fetch always the payload
+pointed at by URL if the number is bigger than their current
+version.  All clients start with version 0 when there is
+no payload. If the payload was previously embedded, a
+hardcoded version could be specified to avoid re-fetching
+the same data.</dd>
+</dl>
+<dl class="docutils" id="url">
+<dt><strong>url</strong>:</dt>
+<dd>Address of the real payload for the application definition,
+which will be cached locally.</dd>
+</dl>
+<dl class="docutils" id="ttl1">
+<dt><strong>ttl</strong>:</dt>
+<dd>Time to live in seconds for the cache of this indicator
+file. You can specify here values like 24 * 60 * 60 to force
+daily updates. You can put here a big number (like 2^31)
+to force an application with no updates. Recommended value
+of 12 * 60 * 60.</dd>
+</dl>
+</div>
+<div class="section" id="general-app-data">
+<h2><a class="toc-backref" href="#id6">3.2&nbsp;&nbsp;&nbsp;General app data</a></h2>
+<p>Example URL for the file:</p>
+<pre class="literal-block">
+http://efaber.net/irekia/v1-appdata
+</pre>
+<p>Contents of the payload. If these are received by the client, they
+will be cached forever. If you need to change something here, modify
+the &quot;v&quot; number in the payload of the version indicator file fetched
+by all clients at TTL intervals:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">{&quot;tabs&quot;: [</div>
+<div class="line-block">
+<div class="line">{&quot;<a class="reference internal" href="#long-title">long_title</a>&quot;: <a class="reference internal" href="#string-id">string_id</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#short-title">short_title</a>&quot;: <a class="reference internal" href="#string-id">string_id</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#class-type">class_type</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#tab-image">tab_image</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#unique-id">unique_id</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#data">data</a>: {...}</div>
+<div class="line">},</div>
+<div class="line">&lt;repeat block for each tab&gt;,</div>
+<div class="line">],</div>
+</div>
+<div class="line">&quot;langs&quot;: [</div>
+<div class="line-block">
+<div class="line">{&quot;<a class="reference internal" href="#langcode">langcode</a>&quot;: {[</div>
+<div class="line-block">
+<div class="line">&quot;1&quot;: string, &quot;2&quot;: string, ...]}},</div>
+</div>
+<div class="line">&lt;repeat langcode for each available language&gt;,</div>
+<div class="line">],</div>
+</div>
+<div class="line">&quot;misc&quot;: {</div>
+<div class="line-block">
+<div class="line">&quot;<a class="reference internal" href="#delete-disk-cache">delete_disk_cache</a>&quot;: [string, ...],</div>
+<div class="line">&quot;<a class="reference internal" href="#slash-scaled-images">slash_scaled_images</a>&quot;: [string, ...]</div>
+<div class="line">}</div>
+</div>
+<div class="line">}</div>
+</div>
+</blockquote>
+<dl class="docutils" id="string-id">
+<dt><strong>string_id</strong>:</dt>
+<dd>Integer pointing to a number stored in langs/langcode/x,
+allowing i18n.</dd>
+</dl>
+<dl class="docutils" id="long-title">
+<dt><strong>long_title</strong>:</dt>
+<dd>The string that will appear on the top of the tab for the
+user to know where is she in the navigation of content.</dd>
+</dl>
+<dl class="docutils" id="short-title">
+<dt><strong>short_title</strong> (optional):</dt>
+<dd>Optionally the string identifier for a shorter version of
+the title that fits better in the small space allocated for
+the tab. If not available, the long_title will be used
+instead.</dd>
+</dl>
+<dl class="docutils" id="class-type">
+<dt><strong>class_type</strong>:</dt>
+<dd><p class="first">String with the name of the class that will be used to
+represent the content of the tab. Available classes are:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#gallery-view-controller">Gallery_view_controller</a></li>
+<li><a class="reference internal" href="#news-view-controller">News_view_controller</a></li>
+<li><a class="reference internal" href="#web-view-controller">Web_view_controller</a></li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="tab-image">
+<dt><strong>tab_image</strong> (optional):</dt>
+<dd>String with embedded base64 version of a file. If not
+present, no image will be used for the tab. Remember that
+in terms of space, you should be providing a PNG whose alpha
+value is used to make pixel transparent, and all others are
+opaque. Monochrome images work best for size.</dd>
+</dl>
+<dl class="docutils" id="unique-id">
+<dt><strong>unique_id</strong></dt>
+<dd><p class="first">Positive number that has to be unique through all other
+tabs in the application. This integer will be used internally
+for things like the disk cache to maintain cache independence
+between tabs, or to locate and communicate tabs.</p>
+<p class="last">If a tab doesn't have an unique identifier or it is being
+repeated, the application will crash.</p>
+</dd>
+</dl>
+<dl class="docutils" id="data">
+<dt><strong>data</strong>:</dt>
+<dd>Additional structure data for the class initialization,
+which is dependant on the type.</dd>
+</dl>
+<dl class="docutils" id="langcode">
+<dt><strong>langcode</strong>:</dt>
+<dd>ISO 649-1 or 649-2 code string representing language. See
+<a class="reference external" href="http://www.loc.gov/standards/iso639-2/php/code_list.php">http://www.loc.gov/standards/iso639-2/php/code_list.php</a>.
+Examples of this would be &quot;es&quot;, &quot;en&quot;, &quot;eu&quot;, etc.</dd>
+</dl>
+<dl class="docutils" id="delete-disk-cache">
+<dt><strong>delete_disk_cache</strong> (optional):</dt>
+<dd><p class="first">This is a list of UDID strings. If your device UDID matches
+one of the strings in this list, the global preferences
+option that says &quot;Flush on next run&quot; will be turned on.
+This means that for the time being the application will
+cache stuff, but the next time you enter the application
+it will be purged. Note that this only changes the application
+setting. You can still exit the application, go to preferences
+and <em>disable</em> the disk cache flush on your next application
+run if you want to preserve the cache.</p>
+<p class="last">UDID strings are long ASCII strings like
+<tt class="docutils literal"><span class="pre">9928be88a0c19c357e2aa1a9d6d42fed4f1302ab</span></tt>. However, there
+is a special string you can use too, and that is <tt class="docutils literal"><span class="pre">simulator</span></tt>.
+If the application finds this string and it is not running
+on one of the known Apple platforms, the cache will also
+be purged on restart.</p>
+</dd>
+</dl>
+<dl class="docutils" id="slash-scaled-images">
+<dt><strong>slash_scaled_images</strong> (optional):</dt>
+<dd><p class="first">This is a list of UDID strings. If your device UDID matches
+one of the strings in this list, all scaled images will be
+overwritten with a red slash. The purpose is to verify
+visually if there are places in the application where images
+are being scaled.  Image scaling does cost CPU time on the
+device, and also hints at places where the server could be
+optimizing the network bandwidth.</p>
+<p>Use the special string <tt class="docutils literal"><span class="pre">simulator</span></tt> as UDID if you are not
+running on a real portable device to activate this feature.</p>
+<p class="last">Note that not all places were scaled images are used get
+the slash, only where the performance may be more sensitive,
+like images for table cells.</p>
+</dd>
+</dl>
+<p>Both tabs and langs are sequence sensitive. Tabs are generated in
+the application from left to right in order of appearance. The
+language codes inside &quot;langs&quot; are also significative. The first
+language will be considered to be the master language, whose strings
+are always loaded. This is required because additional languages
+might not provide all string translations.</p>
+<p>String translations appearing in secondary languages but not in the
+master language are discarded. Implementation detail: strings are
+stored in a contiguous array. Therefore, for efficiency you want
+the string identifiers to be as tightly packed as possible. Empty
+numbers will be represented as nil pointers.</p>
+<p>Also, URLs that the application will fetch for content will have
+the langcode appended. This means that the internationalization of
+the client is closely related to that of the content downloaded.</p>
+<div class="section" id="special-string-identifiers">
+<h3><a class="toc-backref" href="#id7">3.2.1&nbsp;&nbsp;&nbsp;Special string identifiers</a></h3>
+<p>While you can use any identifier for the strings in your applications,
+there are some reserved numbers that mean special global texts for
+the application. They are specified in the global application either
+because they are one-off messages or they are repeated through all
+items of the application and that would waste a lot of space.</p>
+<p>The numbers of the reserved identifiers start at 10000 and have the
+following meaning:</p>
+<dl class="docutils">
+<dt>10000:</dt>
+<dd><p class="first">String for the news sharing title. The string is shown on
+the top of the action sheet presented to the user when she
+taps on the top right corner to share a news item.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Share</span> <span class="pre">this</span>
+<span class="pre">news...</span></tt> will be used.</p>
+</dd>
+<dt>10001:</dt>
+<dd><p class="first">String for the image sharing title. The string is shown on
+the top of the action sheet presented to the user when she
+taps on the top right corner to share a picture item.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Share</span> <span class="pre">this</span>
+<span class="pre">picture...</span></tt> will be used.</p>
+</dd>
+<dt>10002:</dt>
+<dd><p class="first">String for the action sheet button used to copy the address
+of the shared item to the clipboard.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Copy</span> <span class="pre">address</span></tt>
+will be used.</p>
+</dd>
+<dt>10003:</dt>
+<dd><p class="first">String for the action sheet button used to send an email
+with the shared item's URL.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Send</span> <span class="pre">email</span></tt>
+will be used.</p>
+</dd>
+<dt>10004:</dt>
+<dd><p class="first">String for word used to cancel any action.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Cancel</span></tt>
+will be used.</p>
+</dd>
+<dt>10005:</dt>
+<dd><p class="first">String for the email subject when sharing news items by
+email. This string can have text substitution, see <a class="reference internal" href="#email-text-substitution">Email
+text substitution</a>.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">&lt;TITLE&gt;</span></tt>
+will be used.</p>
+</dd>
+<dt>10006:</dt>
+<dd>Like 10005 but for picture items instead of news items.</dd>
+<dt>10007:</dt>
+<dd><p class="first">String for the email body when sharing news items by email.
+This string can have text substitution, see <a class="reference internal" href="#email-text-substitution">Email text
+substitution</a>, and is expected to be in HTML. This means
+that you can embed URLs and stuff like that.</p>
+<p class="last">If nothing is specified, the hardcoded string
+<tt class="docutils literal"><span class="pre">&lt;A</span> <span class="pre">HREF=&quot;&lt;URL&gt;&quot;&gt;&lt;URL&gt;&lt;/A&gt;</span></tt> will be used.</p>
+</dd>
+<dt>10008:</dt>
+<dd>Like 10007 but for picture items instead of news items.</dd>
+<dt>10009:</dt>
+<dd><p class="first">This is a variant of 10008. It is a string for the email
+body when sharing pictures by email which have a description.
+This is different from 10008 because you might want to
+format the text in a different way. Also, if you used the
+PHOTO_DESC tag in 10008, it would be replaced with the empty
+string, and that doesn't look good.</p>
+<p class="last">If nothing is specified, the hardcoded string
+<tt class="docutils literal"><span class="pre">&lt;A</span> <span class="pre">HREF=&quot;&lt;URL&gt;&quot;&gt;&lt;PHOTO_DESC&gt;&lt;/A&gt;</span></tt> will be used.</p>
+</dd>
+<dt>10010:</dt>
+<dd><p class="first">String for the movie sharing title. The string is shown on
+the top of the action sheet presented to the user when she
+taps on the top right corner to share a movie item.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Share</span> <span class="pre">this</span>
+<span class="pre">movie...</span></tt> will be used.</p>
+</dd>
+<dt>10011:</dt>
+<dd><p class="first">String for the email subject when sharing movie items by
+email. This string can have text substitution, see <a class="reference internal" href="#email-text-substitution">Email
+text substitution</a>.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">&lt;TITLE&gt;</span></tt>
+will be used.</p>
+</dd>
+<dt>10012:</dt>
+<dd><p class="first">String for the email body when sharing movie items by email.
+This string can have text substitution, see <a class="reference internal" href="#email-text-substitution">Email text
+substitution</a>, and is expected to be in HTML. This means
+that you can embed URLs and stuff like that.</p>
+<p class="last">If nothing is specified, the hardcoded string
+<tt class="docutils literal"><span class="pre">&lt;A</span> <span class="pre">HREF=&quot;&lt;URL&gt;&quot;&gt;&lt;URL&gt;&lt;/A&gt;</span></tt> will be used.</p>
+</dd>
+<dt>10013:</dt>
+<dd><p class="first">String for the twitter action button when the user is shown
+the sharing options.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Twitter</span></tt>
+will be used.</p>
+</dd>
+<dt>10014:</dt>
+<dd><p class="first">String for the facebook action button when the user is shown
+the sharing options.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Facebook</span></tt>
+will be used.</p>
+</dd>
+<dt>10015:</dt>
+<dd><p class="first">When the iPad launches and there is no article selected, a
+blank view greets the user. This view contains a message
+telling the user to navigate through the sections to select
+an item.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Browse</span> <span class="pre">the</span>
+<span class="pre">sections</span> <span class="pre">and</span> <span class="pre">select</span> <span class="pre">an</span> <span class="pre">item</span></tt> will be used.</p>
+</dd>
+<dt>10016:</dt>
+<dd><p class="first">The iPad features a special button which in portrait mode
+invokes a popover with the available sections. This message
+allows you to change the text on the button.</p>
+<p>As a special case if you specify the empty string as the
+text for this string, the button's text will be dynamic and
+set to the current tab bar title of the selected index. For
+the situations when no item is selected, the first tab's
+title is used.</p>
+<p class="last">If nothing is specified, the hardcoded string <tt class="docutils literal"><span class="pre">Sections</span></tt>
+will be used, meaning the button will have a static nature.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="news-view-controller-class-data">
+<span id="news-view-controller"></span><h3><a class="toc-backref" href="#id8">3.2.2&nbsp;&nbsp;&nbsp;News_view_controller class data</a></h3>
+<p>These are attributes that define the working of a tab managed by
+the class News_view_controller:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">&quot;data&quot;: {</div>
+<div class="line-block">
+<div class="line">&quot;<a class="reference internal" href="#main-url1">main_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#row-height1">row_height</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#padding1">padding</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#image-alignment">image_alignment</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#image-size">image_size</a>&quot;: [int32, int32],</div>
+<div class="line">&quot;<a class="reference internal" href="#title-lines1">title_lines</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#title-size1">title_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#title-color1">title_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#text-size1">text_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#text-color1">text_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#footer-size">footer_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#footer-color">footer_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#footer-alignment">footer_alignment</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#back-normal-color1">back_normal_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#back-highlight-color">back_highlight_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#cache-size1">cache_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#ttl2">ttl</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#download-if-virgin1">download_if_virgin</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#allow-manual-reload1">allow_manual_reload</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#item-disclosure">item_disclosure</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#navigation-changes-section">navigation_changes_section</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-title-padding">section_title_padding</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-collapsed-text-color">section_collapsed_text_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-expanded-text-color">section_expanded_text_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-collapsed-back-color">section_collapsed_back_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-expanded-back-color">section_expanded_back_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#search-bar">search_bar</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#more-items-url">more_items_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#tags-regex">tags_regex</a>&quot;: [string, ...],</div>
+<div class="line">&quot;<a class="reference internal" href="#tags-url">tags_url</a>&quot;: [string, ...],</div>
+<div class="line">&quot;<a class="reference internal" href="#videos-regex">videos_regex</a>&quot;: [string, ...],</div>
+<div class="line">&quot;<a class="reference internal" href="#videos-url">videos_url</a>&quot;: [string, ...]</div>
+<div class="line">}</div>
+</div>
+</div>
+</blockquote>
+<dl class="docutils" id="main-url1">
+<dt><strong>main_url</strong>:</dt>
+<dd><p class="first">The address that will be polled for new items. This URL
+won't be used directly, UI langcode will be appended.
+Examples:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">http://floki/news</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">http://floki/newseu</span></tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">http://floki/news/</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">http://floki/news/eu</span></tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">http://floki/news.html</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">http://floki/news.htmleu</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="#news-item-protocol">News item protocol</a> for information on the structure of
+the data expected by the class.</p>
+<p class="last">Finally, note that if you are embedding the data package
+as a recursive item of the <a class="reference internal" href="#news-item-protocol">News item protocol</a>, the
+main_url attribute will be overwritten by the url attribute
+of the parent item, so in these situations you can ignore
+setting the value, as it will be discarded.</p>
+</dd>
+</dl>
+<dl class="docutils" id="row-height1">
+<dt><strong>row_height</strong> (optional):</dt>
+<dd>Height of each item in pixels. By default 44.</dd>
+</dl>
+<dl class="docutils" id="padding1">
+<dt><strong>padding</strong> (optional):</dt>
+<dd>Padding in pixels between the borders of the cell and
+content. By default it is 3 pixels.</dd>
+</dl>
+<dl class="docutils" id="image-alignment">
+<dt><strong>image_alignment</strong> (optional):</dt>
+<dd>This is an integer but there are really only two possible
+values. When the value is zero, the thumbnail images align
+to the left of the cell. When the value is one, the thumbnail
+images align to the right of the cell. All other possible
+values are discarded at the moment. By default this is zero
+(left image alignment).</dd>
+</dl>
+<dl class="docutils" id="image-size">
+<dt><strong>image_size</strong> (optional):</dt>
+<dd>Pair of two integers, specifying the size. By default images
+will be drawn to 30 pixels of width and the total height
+of the row minus padding.</dd>
+</dl>
+<dl class="docutils" id="title-lines1">
+<dt><strong>title_lines</strong> (optional):</dt>
+<dd>Integer with the number of lines used in the cell for the
+title. By default 1, which is the minimum.</dd>
+</dl>
+<dl class="docutils" id="title-size1">
+<dt><strong>title_size</strong> (optional):</dt>
+<dd>Integer with size of the font. By default 16.</dd>
+</dl>
+<dl class="docutils" id="title-color1">
+<dt><strong>title_color</strong> (optional):</dt>
+<dd>RGB triplet with the font color. By default blue.</dd>
+</dl>
+<dl class="docutils" id="color-triplet">
+<dt><strong>color_triplet</strong>:</dt>
+<dd>A color triplet is just an array of three integers, each
+ranging from 0 to 255 inclusive. Their order specifies the
+red, green and blue color components of the color.</dd>
+</dl>
+<dl class="docutils" id="text-size1">
+<dt><strong>text_size</strong> (optional):</dt>
+<dd>Integer with the size of the main text font. By default 13.</dd>
+</dl>
+<dl class="docutils" id="text-color1">
+<dt><strong>text_color</strong> (optional):</dt>
+<dd>RGB triplet with the font color. By default black.</dd>
+</dl>
+<dl class="docutils" id="footer-size">
+<dt><strong>footer_size</strong> (optional):</dt>
+<dd>Integer with the size of the cell footer. By default 11.
+Note that footers <em>eat</em> space from the bottom of cell. This
+means that text and images will be pushed up, reducing their
+available space.</dd>
+</dl>
+<dl class="docutils" id="footer-color">
+<dt><strong>footer_color</strong> (optional):</dt>
+<dd>RGB triplet with the footer color. By default gray.</dd>
+</dl>
+<dl class="docutils" id="footer-alignment">
+<dt><strong>footer_alignment</strong> (optional):</dt>
+<dd>Footers can be left aligned, centered or right aligned if
+their content doesn't overflow the width of the cell (in
+which case they would be truncated). A negative value will
+align the footer to the left. A value of zero will center
+the footer. A positive value will align the footer to the
+right. By default this is zero (centered footer).</dd>
+</dl>
+<dl class="docutils" id="back-normal-color1">
+<dt><strong>back_normal_color</strong> (optional):</dt>
+<dd>RGB triplet with the background color of the cells. By default white.</dd>
+</dl>
+<dl class="docutils" id="back-highlight-color">
+<dt><strong>back_highlight_color</strong> (optional):</dt>
+<dd>RGB triplet with the highlight color of the cells. By default blue.</dd>
+</dl>
+<dl class="docutils" id="cache-size1">
+<dt><strong>cache_size</strong> (optional):</dt>
+<dd>Number of items to cache for this view. By default 50. Note
+that if the server offers more than these elements for a
+request, the extra elements won't be saved. Also, this value
+is the effective number of entries that will be shown to
+the user, even if the feed contains more elements.</dd>
+</dl>
+<dl class="docutils" id="ttl2">
+<dt><strong>ttl</strong> (optional):</dt>
+<dd>Positive integer, specifies how many seconds have to elapse
+for the view to request a content refresh since the last
+content fetch. By default 300.</dd>
+</dl>
+<dl class="docutils" id="download-if-virgin1">
+<dt><strong>download_if_virgin</strong> (optional):</dt>
+<dd>If true, the view will always request a content refresh to
+the server once the cached items have been loaded, regardless
+of TTL. By default false. This check happens once when the
+view is shown for the first time in the whole application
+run.</dd>
+</dl>
+<dl class="docutils" id="allow-manual-reload1">
+<dt><strong>allow_manual_reload</strong> (optional):</dt>
+<dd>If set to true, the view will show in the top of the
+navigation bar a button with a curled arrow that lets the
+user force refreshing the content from the server. By default no.</dd>
+</dl>
+<dl class="docutils" id="item-disclosure">
+<dt><strong>item_disclosure</strong> (optional):</dt>
+<dd>Base64 graphic used for the item disclosure button. If no
+graphic is present, the default one from the bundle will
+be used.</dd>
+</dl>
+<dl class="docutils" id="navigation-changes-section">
+<dt><strong>navigation_changes_section</strong> (optional):</dt>
+<dd>By default switching news items up and down using the
+navigation buttons is restricted to elements within the
+same section. However, if you set this variable to true,
+the user will seamlessly switch from one section to another
+as if they didn't exist.</dd>
+</dl>
+<dl class="docutils" id="section-title-padding">
+<dt><strong>section_title_padding</strong> (optional):</dt>
+<dd>Amount of pixels used to pad the section text when measured
+on a 320 pixel wide display. The default for this value is
+ten pixels. The padding is applied only to the left and
+right sides of the section header.</dd>
+</dl>
+<dl class="docutils" id="section-collapsed-text-color">
+<dt><strong>section_collapsed_text_color</strong> (optional):</dt>
+<dd>Color for the section header text when the section is
+collapsed. By default this is black (0, 0, 0).</dd>
+</dl>
+<dl class="docutils" id="section-expanded-text-color">
+<dt><strong>section_expanded_text_color</strong> (optional):</dt>
+<dd>Color for the section header text when the section is
+expanded. By default this is white (255, 255, 255).</dd>
+</dl>
+<dl class="docutils" id="section-collapsed-back-color">
+<dt><strong>section_collapsed_back_color</strong> (optional):</dt>
+<dd>Color for the section header background when the section is
+collapsed. By default this is gray (126, 127, 127).</dd>
+</dl>
+<dl class="docutils" id="section-expanded-back-color">
+<dt><strong>section_expanded_back_color</strong> (optional):</dt>
+<dd>Color for the section header background when the section is
+expanded. By default this is bluish (114, 149, 219).</dd>
+</dl>
+<dl class="docutils" id="search-bar">
+<dt><strong>search_bar</strong> (optional):</dt>
+<dd><p class="first">News tabs can have a search bar displayed on top of their
+list. The user types some words in to the search bar and
+pressing return starts a network request against the server
+with the entered terms. The <strong>search_bar</strong> parameter specifies
+the correct search URL that will be used to make the network
+query. The server is expected to return a list of news
+items. The returned items are expected to be <em>children</em> of
+the current tab, but you can force a different parent
+controller in the returned elements through the optional
+<a class="reference internal" href="#parent-id">parent_id</a> parameter.</p>
+<p>If this parameter is present and valid, the search bar
+appears always at the top of the list. The URL you specify
+in this parameter requires some parameter substitution for
+it to be valid (see <a class="reference internal" href="#search-url-substitution">Search URL substitution</a>). If the URL
+doesn't contain the minimum parameters it will be discarded.
+Here's a valid example:</p>
+<pre class="literal-block">
+http://efaber.net/_LNG_/search?q=_WORDS_&amp;page=_PAGE_
+</pre>
+<p class="last">The view which will show the search results won't cache the
+list of results, and therefore has no limit of items
+displayed. The items themselves will be cached, though,
+once the user touches them.</p>
+</dd>
+</dl>
+<dl class="docutils" id="more-items-url">
+<dt><strong>more_items_url</strong> (optional):</dt>
+<dd><p class="first">News and gallery tabs display content based on identifiers.
+More recent items have higher <a class="reference internal" href="#id">id</a> numbers, and the server
+only provides a handful. If the server allows traversing
+the feed into the past (people from the past also have
+rights, you know), the controller has to specify the format
+URL which will be queried for more items of the same type:</p>
+<pre class="literal-block">
+http://efaber.net/_LNG_/kpop?more_items
+</pre>
+<p>Just like the <a class="reference internal" href="#search-bar">search_bar</a>, the URL will replace the _LNG_
+substring by the currently used language. But wait, where are
+the params? How does the server know what items have to be
+returned? This is known through the <a class="reference internal" href="#communication-of-parameters-to-the-server">Communication of parameters
+to the server</a> feature which will convert the previous URL
+into the following more likely example:</p>
+<pre class="literal-block">
+http://efaber.net/eu/kpop?more_items&amp;d=2&amp;l=450&amp;h=633
+</pre>
+<p class="last">By extracting the <strong>l</strong> parameter of the URL, the server
+knows what elements the client has and therefore what is
+to be sent. If the <strong>l</strong> parameter is not present in the
+query, it has to return an empty set or a server HTTP error
+(like one of 5xx or 4xx). Note that the server is not
+required to have a <strong>?more_items</strong> param, it only has to
+be a different URL from <a class="reference internal" href="#main-url1">main_url</a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="tags-regex">
+<dt><strong>tags_regex</strong> (optional):</dt>
+<dd><p class="first">When the user touches a link inside web content, before
+going to the URL, the application matches the link against
+a set of regular expressions registered by all news
+controllers. If any of those expressions match, the link
+is instead opened with a new duplicate of the controller
+which captured the link. The <strong>tags_regex</strong> parameter
+specifies an array of regular expressions to match and
+capture. The found links will be opened as a paginated tag
+search using the first captured group as tag input. Example:</p>
+<pre class="literal-block">
+&quot;tags_regex&quot;: [
+        &quot;http://www.irekia.euskadi.net/.*tags/([^?]+)[?]type=News&quot;,
+        &quot;http://mirekia.euskadi.net/.*tags/([^?]+)[?]type=News&quot;]
+</pre>
+<p>In this example, two kind of URL patterns will be captured
+as tag links and opened with the news view controller which
+specified those patterns. The format of the regular expressions
+is the ICU syntax, documented at
+<a class="reference external" href="http://regexkit.sourceforge.net/RegexKitLite/#ICUSyntax">http://regexkit.sourceforge.net/RegexKitLite/#ICUSyntax</a>.
+You will need to escape JSON characters. Some characters
+like the dot practically don't need escaping. Other characters
+characters like the question mark need escaping, for instance,
+putting them inside a range.</p>
+<p class="last">If a pattern is invalid or somehow doesn't work, it will
+be silently ignored, though log messages may be generated
+in debug builds during app initialization to help trace the
+problem. The regular expression is expected to have a single
+group. Additional matching groups are discarded. Log messages
+will indicate what part of the URL was extracted.</p>
+</dd>
+</dl>
+<dl class="docutils" id="tags-url">
+<dt><strong>tags_url</strong> (optional):</dt>
+<dd>While the <a class="reference internal" href="#tags-regex">tags_regex</a> parameter specifies how links are
+captured, the <strong>tags_url</strong> parameter specifies how the
+captured tags will be processed by the controller. The
+format of the URL is the same as for <a class="reference internal" href="#search-bar">search_bar</a>.</dd>
+</dl>
+<dl class="docutils" id="videos-regex">
+<dt><strong>videos_regex</strong> (optional):</dt>
+<dd>Exactly just like <a class="reference internal" href="#tags-regex">tags_regex</a>, the user may touch a link
+which points to a video. The difference here is that the
+video URL is expected to return a single video element in
+the typical array of <a class="reference internal" href="#news-item-protocol">News item protocol</a> (additional
+elements will be ignored). Other than that it works pretty
+much the same.</dd>
+</dl>
+<dl class="docutils" id="videos-url">
+<dt><strong>videos_url</strong> (optional):</dt>
+<dd>Pair version of <a class="reference internal" href="#tags-url">tags_url</a> for <a class="reference internal" href="#videos-regex">videos_regex</a>. Unlike <a class="reference internal" href="#tags-url">tags_url</a>,
+here the text substitution of the URL won't require the
+<strong>_PAGE_</strong> substring to be present. Still, the <strong>_WORDS_</strong>
+substring is required and will be replaced with whatever
+<a class="reference internal" href="#videos-regex">videos_regex</a> did capture in the original URL (see <a class="reference internal" href="#search-url-substitution">Search
+URL substitution</a>).</dd>
+</dl>
+<div class="section" id="item-view-controller-class-data">
+<span id="item-view-controller"></span><h4><a class="toc-backref" href="#id9">3.2.2.1&nbsp;&nbsp;&nbsp;Item_view_controller class data</a></h4>
+<p>This controller is invoked from the <a class="reference internal" href="#news-view-controller">News_view_controller</a>, and it
+handles the showing of the individual news items. It's the default
+controller for the entries of the <a class="reference internal" href="#news-item-protocol">News item protocol</a>. This entry
+exists only for completeness, you rarely need to do anything manual
+with this class.</p>
+</div>
+</div>
+<div class="section" id="web-view-controller-class-data">
+<span id="web-view-controller"></span><h3><a class="toc-backref" href="#id10">3.2.3&nbsp;&nbsp;&nbsp;Web_view_controller class data</a></h3>
+<p>These are attributes that define the working of a tab managed by
+the class Web_view_controller:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">&quot;data&quot;: {</div>
+<div class="line-block">
+<div class="line">&quot;<a class="reference internal" href="#main-url2">main_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#scales-page-to-fit">scales_page_to_fit</a>&quot;: bool</div>
+<div class="line">}</div>
+</div>
+</div>
+</blockquote>
+<dl class="docutils" id="main-url2">
+<dt><strong>main_url</strong>:</dt>
+<dd>The address that will be polled for new items. This URL
+won't be used directly, UI langcode will be appended. See
+<a class="reference internal" href="#news-view-controller-class-data">News_view_controller class data</a> for examples.</dd>
+</dl>
+<dl class="docutils" id="scales-page-to-fit">
+<dt><strong>scales_page_to_fit</strong> (optional):</dt>
+<dd>Allow the pages to scale. By default false.</dd>
+</dl>
+</div>
+<div class="section" id="gallery-view-controller-class-data">
+<span id="gallery-view-controller"></span><h3><a class="toc-backref" href="#id11">3.2.4&nbsp;&nbsp;&nbsp;Gallery_view_controller class data</a></h3>
+<p>These are attributes that define the working of a tab managed by
+the class Gallery_view_controller:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">&quot;data&quot;: {</div>
+<div class="line-block">
+<div class="line">&quot;<a class="reference internal" href="#main-url3">main_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#row-height2">row_height</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#cells-per-row">cells_per_row</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#padding2">padding</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#cell-normal-color">cell_normal_color</a>&quot;: color_triplet,</div>
+<div class="line">&quot;<a class="reference internal" href="#cell-highlight-color">cell_highlight_color</a>&quot;: color_triplet,</div>
+<div class="line">&quot;<a class="reference internal" href="#cache-size2">cache_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#ttl3">ttl</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#download-if-virgin2">download_if_virgin</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#allow-manual-reload2">allow_manual_reload</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#stretch-images">stretch_images</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#more-items-url">more_items_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#gallery-regex">gallery_regex</a>&quot;: [string, ...],</div>
+<div class="line">&quot;<a class="reference internal" href="#gallery-url">gallery_url</a>&quot;: [string, ...]</div>
+<div class="line">}</div>
+</div>
+</div>
+</blockquote>
+<dl class="docutils" id="main-url3">
+<dt><strong>main_url</strong>:</dt>
+<dd>The address that will be polled for new items. This URL
+won't be used directly, UI langcode will be appended. See
+examples of these URLs in the <a class="reference internal" href="#news-view-controller-class-data">News_view_controller class
+data</a> section and additional usage notes. See <a class="reference internal" href="#gallery-item-protocol">Gallery
+item protocol</a> for information on the structure of the
+data expected by the class.</dd>
+</dl>
+<dl class="docutils" id="row-height2">
+<dt><strong>row_height</strong> (optional):</dt>
+<dd>Height of each row in pixels. By default 79.</dd>
+</dl>
+<dl class="docutils" id="cells-per-row">
+<dt><strong>cells_per_row</strong> (optional):</dt>
+<dd>Number of maximum images on each row. By default 4. The
+size of each thumbnail is calculated according to the
+row_height, number of cells per row and padding. See below.</dd>
+</dl>
+<dl class="docutils" id="padding2">
+<dt><strong>padding</strong> (optional):</dt>
+<dd>Padding in pixels between the borders of the cell and
+content, and also between images of the same row. By default
+it is 2 pixels.</dd>
+</dl>
+<dl class="docutils" id="cell-normal-color">
+<dt><strong>cell_normal_color</strong> (optional):</dt>
+<dd>RGB triplet with the background color of the cells. By default white.</dd>
+</dl>
+<dl class="docutils" id="cell-highlight-color">
+<dt><strong>cell_highlight_color</strong> (optional):</dt>
+<dd>RGB triplet with the highlight color of the cells. The
+highlight color will be drawn over the image at 50% opacity.
+By default black.</dd>
+</dl>
+<dl class="docutils" id="cache-size2">
+<dt><strong>cache_size</strong> (optional):</dt>
+<dd>Number of items to cache for this view. By default 50. Note
+that if the server offers more than these elements for a
+request, the extra elements won't be saved. Also, this value
+is the effective number of entries that will be shown to
+the user, even if the feed contains more elements.</dd>
+</dl>
+<dl class="docutils" id="ttl3">
+<dt><strong>ttl</strong> (optional):</dt>
+<dd>Positive integer, specifies how many seconds have to elapse
+for the view to request a content refresh since the last
+content fetch. By default 300.</dd>
+</dl>
+<dl class="docutils" id="download-if-virgin2">
+<dt><strong>download_if_virgin</strong> (optional):</dt>
+<dd>If true, the view will always request a content refresh to
+the server once the cached items have been loaded, regardless
+of TTL. By default false. This check happens once when the
+view is shown for the first time in the whole application
+run.</dd>
+</dl>
+<dl class="docutils" id="allow-manual-reload2">
+<dt><strong>allow_manual_reload</strong> (optional):</dt>
+<dd>If set to true, the view will show in the top of the
+navigation bar a button with a curled arrow that lets the
+user force refreshing the content from the server. By default no.</dd>
+</dl>
+<dl class="docutils" id="stretch-images">
+<dt><strong>stretch_images</strong> (optional):</dt>
+<dd>If set to true, the thumbnails will be stretched to fill
+completely their size. If set to false, the thumbnail image
+will be scaled proportionally to the area. By default set
+to yes.</dd>
+</dl>
+<dl class="docutils" id="gallery-regex">
+<dt><strong>gallery_regex</strong> (optional):</dt>
+<dd>Just like <a class="reference internal" href="#videos-regex">videos_regex</a> but expects the URL to return a
+JSON with a group of photo elements following the <a class="reference internal" href="#gallery-item-protocol">Gallery
+item protocol</a>. The pagination/older mechanisms will be
+ignored, the server is expected to return all available
+photo items in one go.</dd>
+</dl>
+<dl class="docutils" id="gallery-url">
+<dt><strong>gallery_url</strong> (optional):</dt>
+<dd>Pair version of <a class="reference internal" href="#videos-url">videos_url</a> for <a class="reference internal" href="#gallery-regex">gallery_regex</a>.</dd>
+</dl>
+<p>The vertical size of the thumbnails is easy to work out: it is the
+size of the row height minus two times the padding size. For the
+default row, this means that images are 75 pixels tall.</p>
+<p>For the horizontal axis, the width of the thumbnail is calculated
+according to the number of padded images that fit inside the row's
+usable width (320 pixels) minus two times the padding. For instance,
+if you wanted six images in the row with three pixels of padding,
+that would be:</p>
+<pre class="literal-block">
+320 - (3 * 2) - (x + 3 * 2) * 6 = 0
+        or
+x = (320 - 3 * 2) / 6 - 2 * 3
+        or
+cell_width = (320 - 2 * padding) / cells_per_row - 2 * padding
+</pre>
+<p>Note that the sizes have to be integers. The cell_width value is
+calculated as a floating point but then floored to an integer. For
+the case above, that means that instead of using 46.3 pixels per
+cell, we would use 46, and that will leave 8 pixels extra padding
+for the whole row.</p>
+<p>The extra padding is not used to separate the image cells. Instead,
+it is divided by two, floored to an integer, and added to the left
+of the row, leaving the remainder of the padding to the right side
+of the row.</p>
+<p>It is recommended that you don't use thumbnail image stretching at
+all and generate the thumbnails in such a way that no screen space
+is wasted. The default thumbnails are square, and most images are
+not. If you have thumbnail areas of 75x75 pixels and an image of
+320x200, don't scale the image to a thumbnail of 75x47 pixels,
+leaving empty space above/below. Instead, center crop the image to
+200x200 and then scale it to 75x75. This is what the iPod's stock
+gallery does, and it works pretty well for most images.</p>
+<div class="section" id="photo-view-controller-class-data">
+<span id="photo-view-controller"></span><h4><a class="toc-backref" href="#id12">3.2.4.1&nbsp;&nbsp;&nbsp;Photo_view_controller class data</a></h4>
+<p>This controller is invoked from the <a class="reference internal" href="#gallery-view-controller">Gallery_view_controller</a>, and
+it handles the showing of the individual pictures. It's the default
+controller for the entries of the <a class="reference internal" href="#gallery-item-protocol">Gallery item protocol</a>. This
+entry exists only for completeness, you rarely need to do anything
+manual with this class.</p>
+</div>
+</div>
+<div class="section" id="preferences-view-controller-class-data">
+<h3><a class="toc-backref" href="#id13">3.2.5&nbsp;&nbsp;&nbsp;Preferences_view_controller class data</a></h3>
+<p>The preferences tab of the application allows to perform some simple
+generic system operations. This tab is nearly a replica of the
+system settings of the application, and can be embedded in the
+application for those clueless users who don't know where the
+settings are.</p>
+<p>These are attributes that define the working of a tab managed by
+the class Preferences_view_controller:</p>
+<pre class="literal-block">
+&quot;data&quot;: {
+        &quot;language_position&quot;: int32,
+        &quot;cache_info_position&quot;: int32,
+        &quot;clear_cache_position&quot;: int32,
+        &quot;text_position&quot;: int32,
+        &quot;text_string&quot;: string_id
+        }
+</pre>
+<dl class="docutils">
+<dt><strong>language_position</strong>:</dt>
+<dd>Specifies with a positive integer the sorting order of the
+option on the screen. If the value is zero or negative, the
+option won't show up to the user. This option allows the
+user to change the preferred language of the application
+between automatic and the ones provided by the application
+protocol.
+</dd>
+<dt><strong>cache_info_position</strong>:</dt>
+<dd>Specifies with a positive integer the sorting order of the
+cell on the screen. If the value is zero or negative, the
+cell won't show up to the user. This cell is interaction less
+and merely shows the size of the disk cache, updated in
+real time.
+</dd>
+<dt><strong>clear_cache_position</strong>:</dt>
+<dd>Specifies with a positive integer the sorting order of the
+button on the screen. If the value is zero or negative, the
+button won't show up to the user. This button will purge
+the disk cache for everything, app information included.
+</dd>
+<dt><strong>text_position</strong> (optional):</dt>
+<dd>If present, specifies with a positive integer the sorting
+order of a chunk of text on the screen. This text will
+appear centered, and can be multiline.
+</dd>
+<dt><strong>text_string</strong> (optional):</dt>
+<dd>Identifier of the multiline text string that can be shown
+on the screen between, before, or after other options.
+</dd>
+</dl>
+<p>Both the language and clear cache options empty the cache and require
+the user to exit and reenter the application. The difference is
+that the language option modifies a system setting, and it doesn't
+remove the application specification cache, only content cache. On
+the other hand, clear cache simply deletes the cache file for it
+to be recreated. Before exitting the application the user is prompted
+with a confirmation question to avoid input mistakes.</p>
+<p>Specifying the same position for different settings will crash the
+application. The actual numbers are meaningless, you can use values
+like 100, 200, 300. The only important thing is that they don't
+repeat and are positive.</p>
+</div>
+<div class="section" id="movie-view-controller-class-data">
+<span id="movie-view-controller"></span><h3><a class="toc-backref" href="#id14">3.2.6&nbsp;&nbsp;&nbsp;Movie_view_controller class data</a></h3>
+<p>If you want to show a picture to the user, you feed the <a class="reference internal" href="#gallery-item-protocol">Gallery
+item protocol</a> to a <a class="reference internal" href="#gallery-view-controller">Gallery_view_controller</a>. But news items and
+pictures are <em>simple</em> compared to movies.  Due to the size of the
+device, movies are always played back at full screen and already
+take up space for the interface to control the film. They are also
+potentially bandwidth demanding, so if a user touched by mistake
+a video, and that started a huge transfer, it could be bad.</p>
+<p>The Movie_view_controller class is a <em>facade</em> that sits between an
+index entry and the actual film allowing the user to decide to watch
+or not video based on further detail information and improved preview
+picture. The <em>facade</em> page will show the big preview picture, a
+cell button to view the movie and the title description later.
+Unless the <em>autoload</em> parameter is false, the play button will be
+automatically pressed and change into a wait animation.</p>
+<p>These are attributes that define the working of a tab managed by
+the class Movie_view_controller:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">&quot;data&quot;: {</div>
+<div class="line-block">
+<div class="line">&quot;<a class="reference internal" href="#main-url4">main_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#progressive-file">progressive_file</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#preview-url">preview_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#preview-width">preview_width</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#preview-height">preview_height</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#padding">padding</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#title">title</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#title-id">title_id</a>&quot;: string_id,</div>
+<div class="line">&quot;<a class="reference internal" href="#title-lines2">title_lines</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#title-size2">title_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#title-color2">title_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#text">text</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#text-id">text_id</a>&quot;: string_id,</div>
+<div class="line">&quot;<a class="reference internal" href="#text-size2">text_size</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#text-color2">text_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#playback-color">playback_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#back-normal-color2">back_normal_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#autoload">autoload</a>&quot;: bool</div>
+<div class="line">}</div>
+</div>
+</div>
+</blockquote>
+<dl class="docutils" id="main-url4">
+<dt><strong>main_url</strong>:</dt>
+<dd><p class="first">The address that will be used to load a movie. Note that
+since you are more likely to use the Movie_view_controller
+from a <a class="reference internal" href="#news-item-protocol">News item protocol</a> rather than as a standalone
+tab, you would not need to specify this URL since the parent
+item will specify it. More detail in the <a class="reference internal" href="#news-view-controller-class-data">News_view_controller
+class data</a> section.</p>
+<p class="last">This url should point to an m3u8 file with information about
+an HTTP stream for iOS devices. For a non HTTP stream use
+<a class="reference internal" href="#progressive-file">progressive_file</a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="progressive-file">
+<dt><strong>progressive_file</strong> (optional):</dt>
+<dd><p class="first">This address is an alternative version of <a class="reference internal" href="#main-url4">main_url</a> for
+those devices not supporting iOS HTTP streaming. It should
+be a progressive enabled mp4 file, meaning that it will be
+played back as it is being downloaded.</p>
+<p>If you don't specify this attribute and a device needs this
+value, the <a class="reference internal" href="#main-url4">main_url</a> address will be used after going
+through a little transformation process:</p>
+<ul class="simple">
+<li>The string <strong>/ts/</strong> will be replaced by <strong>/html5/</strong>.</li>
+<li>The string <strong>m3u8</strong> will be replaced by <strong>m4v</strong>.</li>
+</ul>
+<p>The following example <a class="reference internal" href="#main-url4">main_url</a>:</p>
+<blockquote>
+<a class="reference external" href="http://efaber.net/video/ts/roly-poly.m3u8">http://efaber.net/video/ts/roly-poly.m3u8</a></blockquote>
+<p>...will therefore become:</p>
+<blockquote>
+<a class="reference external" href="http://efaber.net/video/html5/roly-poly.m4v">http://efaber.net/video/html5/roly-poly.m4v</a></blockquote>
+<p class="last">If the url pattern after the transformation doesn't satisfy
+you, you will have to specify it manually.</p>
+</dd>
+</dl>
+<dl class="docutils" id="preview-url">
+<dt><strong>preview_url</strong> (optional):</dt>
+<dd><p class="first">Address of a big poster image for the user to see with more
+detail what the video contains.</p>
+<p class="last">You can specify here a relative path to the preview URL
+with regards to <em>main_url</em>.  However, you are likely
+to have multiple servers handle different media content and
+the preview URL picture may be on a different server, thus
+requiring an absolute URL.</p>
+</dd>
+</dl>
+<dl class="docutils" id="preview-width">
+<dt><strong>preview_width</strong> (optional):</dt>
+<dd>Width that the poster image will be stretched to. The minimum
+value is 30, the maximum (and default) value is 285 for
+iPhone devices and 450 for iPad devices.</dd>
+</dl>
+<dl class="docutils" id="preview-height">
+<dt><strong>preview_height</strong> (optional):</dt>
+<dd>Height that the poster image will be stretched to. The
+minimum value is 30, the maximum (and default) value is
+160 for iPhone devices and 400 for iPad devices.</dd>
+</dl>
+<dl class="docutils" id="padding">
+<dt><strong>padding</strong> (optional):</dt>
+<dd>Padding in pixels between the borders of the cell and
+content. By default it is 3 pixels.</dd>
+</dl>
+<dl class="docutils" id="title">
+<dt><strong>title</strong> (optional):</dt>
+<dd>The title that will be shown. By default no title, or
+inherited from the parent protocol entry.</dd>
+</dl>
+<dl class="docutils" id="title-id">
+<dt><strong>title_id</strong> (optional):</dt>
+<dd>If there is no <em>title</em> attribute, the title_id should point
+to an i18n string. You want to use this only if you are
+setting up the controller class for a tab where content
+language has not been decided yet.</dd>
+</dl>
+<dl class="docutils" id="title-lines2">
+<dt><strong>title_lines</strong> (optional):</dt>
+<dd>Integer with the number of lines used in the text cell for
+the title. By default 10, which should be enough to avoid
+title truncation. You may want to set this to 1 or 2 to
+force truncation.</dd>
+</dl>
+<dl class="docutils" id="title-size2">
+<dt><strong>title_size</strong> (optional):</dt>
+<dd>Integer with size of the font. By default 16.</dd>
+</dl>
+<dl class="docutils" id="title-color2">
+<dt><strong>title_color</strong> (optional):</dt>
+<dd>RGB triplet with the font color. By default blue.</dd>
+</dl>
+<dl class="docutils" id="text">
+<dt><strong>text</strong> (optional):</dt>
+<dd>The text that will be shown. By default no text, or
+inherited from the parent protocol entry.</dd>
+</dl>
+<dl class="docutils" id="text-id">
+<dt><strong>text_id</strong> (optional):</dt>
+<dd>If there is no <em>text</em> attribute, the text_id should point
+to an i18n string. You want to use this only if you are
+setting up the controller class for a tab where content
+language has not been decided yet.</dd>
+</dl>
+<dl class="docutils" id="text-size2">
+<dt><strong>text_size</strong> (optional):</dt>
+<dd>Integer with the size of the main text font. By default 13.</dd>
+</dl>
+<dl class="docutils" id="text-color2">
+<dt><strong>text_color</strong> (optional):</dt>
+<dd>RGB triplet with the font color. By default black.</dd>
+</dl>
+<dl class="docutils" id="playback-color">
+<dt><strong>playback_color</strong> (optional):</dt>
+<dd>RGB triplet for the background color of the video button
+cell which will be shown when the user touches the cell to
+play back the video. By default light gray.</dd>
+</dl>
+<dl class="docutils" id="back-normal-color2">
+<dt><strong>back_normal_color</strong> (optional):</dt>
+<dd>RGB triplet with the background color of the cells. By default white.</dd>
+</dl>
+<dl class="docutils" id="autoload">
+<dt><strong>autoload</strong> (optional):</dt>
+<dd>By default set to true. This means that as soon as the
+<em>facade</em> movie controller view is displayed, the movie will
+be loaded and played back. If you set this to no, the user
+will have to explicitly tap on the &quot;Play back video&quot; button.</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="protocols">
+<h1><a class="toc-backref" href="#id15">4&nbsp;&nbsp;&nbsp;Protocols</a></h1>
+<div class="section" id="news-item-protocol">
+<h2><a class="toc-backref" href="#id16">4.1&nbsp;&nbsp;&nbsp;News item protocol</a></h2>
+<p>This section describes the protocol of the data retrieved by the
+<a class="reference internal" href="#news-view-controller-class-data">News_view_controller class data</a> as specified in the main_url
+parameter. News items are really just preview-headers that point
+to pre-generated downloadable HTML content that will be loaded by
+the client. Note that there is no <strong>langs</strong> element like in <a class="reference internal" href="#general-app-data">General
+app data</a> because this content is already presumed to be localized
+to the user's interface according to the URL it was downloaded from:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">{&quot;items&quot;: [</div>
+<div class="line-block">
+<div class="line">{&quot;<a class="reference internal" href="#id">id</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#parent-id">parent_id</a>&quot;: int32 | string,</div>
+<div class="line">&quot;<a class="reference internal" href="#sort-id">sort_id</a>&quot;: int64,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-ids">section_ids</a>&quot;: [int32, ...],</div>
+<div class="line">&quot;<a class="reference internal" href="#title2">title</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#url2">url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#image">image</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#expiration-date">expiration_date</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#share-url">share_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#online">online</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#body">body</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#footer">footer</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#class-type2">class_type</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#data2">data</a>&quot;: {...}</div>
+<div class="line">},</div>
+<div class="line">&lt;repeat block for each item&gt;,</div>
+<div class="line">],</div>
+</div>
+<div class="line">&quot;<a class="reference internal" href="#to-delete">to_delete</a>&quot;: [int32, int32, int32],</div>
+<div class="line">&quot;<a class="reference internal" href="#sections">sections</a>&quot;: ...,</div>
+<div class="line">&quot;<a class="reference internal" href="#has-older">has_older</a>&quot;: bool</div>
+<div class="line">}</div>
+</div>
+</blockquote>
+<dl class="docutils" id="id">
+<dt><strong>id</strong>:</dt>
+<dd>Identifier of the news element, required to be a positive
+integer. A stream of new items shouldn't have identifiers
+repeated. That would be madness, so they will likely be
+discarded.</dd>
+</dl>
+<dl class="docutils" id="parent-id">
+<dt><strong>parent_id</strong> (optional):</dt>
+<dd>
+<p>Most of the time items are simply children of whatever tab
+they appear in. However, if you want to provide a <a class="reference internal" href="#search-bar">search_bar</a>
+with results for multiple controllers, you may need to
+specify the controller the item is child of.</p>
+<p class="last">Note that you can use a string to refer to a controller's
+name or its identifier. If the parent controller is not
+found, the item will likely be eaten by a grue.</p>
+</dd>
+</dl>
+<dl class="docutils" id="sort-id">
+<dt><strong>sort_id</strong> (optional):</dt>
+<dd>A positive 64bit integer value which will be used for
+sorting. Items for the user will be sorted according to
+this value, higher values will appear on top. If the attribute
+doesn't exist, the sort_id will be set to the id.</dd>
+</dl>
+<dl class="docutils" id="section-ids">
+<dt><strong>section_ids</strong> (optional):</dt>
+<dd>Array of positive integers specifying what sections this
+item belongs to. By default the value of the attribute is
+the empty list. Therefore the item won't show up on any
+section if the server specifies any. See <a class="reference internal" href="#section-parameters">Section parameters</a>
+for more details.</dd>
+</dl>
+<dl class="docutils" id="title2">
+<dt><strong>title</strong>:</dt>
+<dd>String of text that will be shown for the title. The title
+will be truncated if it doesn't fit horizontally, but it
+can be multiline depending on the attributes of the parent.</dd>
+</dl>
+<dl class="docutils" id="url2">
+<dt><strong>url</strong> (optional):</dt>
+<dd>URL to the webcontent that will be shown to the user if she
+presses the cell. If not present, the cell won't show a
+disclosure indicator and won't react to the user's touch.</dd>
+</dl>
+<dl class="docutils" id="image">
+<dt><strong>image</strong> (optional):</dt>
+<dd>URL to the image of the cell if available. The path can be
+relative to the main_url parameter, or absolute. If the
+field is not present, no image will be shown and the text
+won't be indented. If the field is present, first the default
+image placeholder will be displayed, and later the image
+itself or the default error image if there is any problem
+with it.</dd>
+</dl>
+<dl class="docutils" id="expiration-date">
+<dt><strong>expiration_date</strong> (optional):</dt>
+<dd>If this value is present and greater than zero, it represents
+the automatic expiration date of an item. Think of it as
+an automatic time related <em>to_delete</em> tag attached to
+individual content entries.
+The expiration date is stored as the number of seconds
+elapsed since the epoch. If the current device's clock is
+greater than this date, the element will expire while
+processing the cache or retrieving items from the server.</dd>
+</dl>
+<dl class="docutils" id="share-url">
+<dt><strong>share_url</strong> (optional):</dt>
+<dd>URL to the content of the item on the <em>real</em> web. If this
+attribute is present, the view will show an action button
+on the top right corner to allow people copy this shared
+URL to the clipboard or share it through email.
+The address you put here has to be an absolute URL, because
+it will be seen out of the context of the application.</dd>
+</dl>
+<dl class="docutils" id="online">
+<dt><strong>online</strong> (optional):</dt>
+<dd><p class="first">Boolean, by default false. If true, prevents the content
+from being cached and will always be reloaded, even if the
+user dismisses the view and tries to watch it again after
+a second.</p>
+<p class="last">Note that if an item has online set to false, and
+is cached by a client, setting this to true in the server
+won't delete the local cache, only ignore it. If you really
+need to remove traces of possibly cached content, you need
+to delete the item and generate a new one with caching
+turned off since the beginning.</p>
+</dd>
+</dl>
+<dl class="docutils" id="body">
+<dt><strong>body</strong>:</dt>
+<dd>Multiline text that will be shown below the title. Think
+of users viewing the cell in landscape view to define the
+size of this string.</dd>
+</dl>
+<dl class="docutils" id="footer">
+<dt><strong>footer</strong> (optional):</dt>
+<dd>Single string of text that will be shown at the bottom of
+the cell. You can pass the empty string if you want to force
+a homogeneous look for your whole table even if some cells
+don't have a footer.</dd>
+</dl>
+<dl class="docutils" id="class-type2">
+<dt><strong>class_type</strong> (optional):</dt>
+<dd><p class="first">String with the name of the class that will be used to
+handle the URL. The following are available:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#item-view-controller">Item_view_controller</a> (this is the default)</li>
+<li><a class="reference internal" href="#gallery-view-controller">Gallery_view_controller</a></li>
+<li><a class="reference internal" href="#news-view-controller">News_view_controller</a></li>
+<li><a class="reference internal" href="#web-view-controller">Web_view_controller</a></li>
+<li><a class="reference internal" href="#movie-view-controller">Movie_view_controller</a></li>
+</ul>
+<p class="last"><a class="reference internal" href="#item-view-controller">Item_view_controller</a> will open the expected pre-generated HTML
+served to the client. However, with this attribute you can
+nest different types of content to be opened with other non
+default classes. Nested content will use the data attribute
+which is expected to contain the same set of attributes as
+one of the tab definitions.</p>
+</dd>
+</dl>
+<dl class="docutils" id="data2">
+<dt><strong>data</strong> (optional):</dt>
+<dd>If you are using a <em>class_type</em> other than the default
+value, use this attribute to pack the parameters required
+for the sub controller. See the documentation of the
+controller for the parameters required here.</dd>
+</dl>
+<dl class="docutils" id="to-delete">
+<dt><strong>to_delete</strong> (optional):</dt>
+<dd>List of identifiers that are forced to be deleted. Before
+showing anything to the user, news are filtered against
+this list, even from the disk cache. It only makes sense
+to provide identifiers as old as cache_size items allowed
+for the tab, since older entries will expire anyway from
+the view during the next successful content fetch.</dd>
+</dl>
+<dl class="docutils" id="sections">
+<dt><strong>sections</strong> (optional):</dt>
+<dd>Optional block of attributes related to sectioning the
+items. See <a class="reference internal" href="#section-parameters">Section parameters</a> for further information.</dd>
+</dl>
+<dl class="docutils" id="has-older">
+<dt><strong>has_older</strong> (optional):</dt>
+<dd>If this optional parameter is present and set to YES (by
+default it is set to NO), the controller will understand
+that older items may be retrieved from the feed. Older items
+are requested to the server using the <strong>o</strong> parameter. See
+<a class="reference internal" href="#communication-of-parameters-to-the-server">Communication of parameters to the server</a> for examples.</dd>
+</dl>
+<p>When the user presses a cell with URL parameter, a new web view is
+shown with the loading activity indicator. When the content is
+fetched, it is cached locally and displayed. If the displayed HTML
+requires external resources, they can be absolute or relative, but
+they won't be cached. For images, better specify the alt/width/height
+attributes so that the web view can allocate the space in the first
+render.</p>
+</div>
+<div class="section" id="gallery-item-protocol">
+<h2><a class="toc-backref" href="#id17">4.2&nbsp;&nbsp;&nbsp;Gallery item protocol</a></h2>
+<p>This protocol is based on the <a class="reference internal" href="#news-item-protocol">News item protocol</a>, so only new
+or different things will be explained. The data provided by this
+protocol are the images to be shown by a <a class="reference internal" href="#gallery-view-controller">Gallery_view_controller</a>:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">{&quot;thumbs&quot;: [</div>
+<div class="line-block">
+<div class="line">{&quot;<a class="reference internal" href="#id">id</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#sort-id">sort_id</a>&quot;: int64,</div>
+<div class="line">&quot;<a class="reference internal" href="#section-ids">section_ids</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#title3">title</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#url3">url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#image2">image</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#expiration-date">expiration_date</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#share-url">share_url</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#online">online</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#width">width</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#height">height</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#max-zoom">max_zoom</a>&quot;: float,</div>
+<div class="line">&quot;<a class="reference internal" href="#caption-text">caption_text</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#class-type3">class_type</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#data3">data</a>&quot;: {...}</div>
+<div class="line">},</div>
+<div class="line">&lt;repeat block for each item&gt;,</div>
+<div class="line">],</div>
+</div>
+<div class="line">&quot;<a class="reference internal" href="#to-delete">to_delete</a>&quot;: [int32, int32, int32],</div>
+<div class="line">&quot;<a class="reference internal" href="#sections">sections</a>&quot;: ...,</div>
+<div class="line">&quot;<a class="reference internal" href="#has-older">has_older</a>&quot;: bool</div>
+<div class="line">}</div>
+</div>
+</blockquote>
+<dl class="docutils" id="title3">
+<dt><strong>title</strong> (optional):</dt>
+<dd>Images can have a title. The title will be displayed on top
+of the view on a translucent HUD, which fades in/out when
+the user touches the screen. If you specify the empty string,
+the caption area won't appear.</dd>
+</dl>
+<dl class="docutils" id="url3">
+<dt><strong>url</strong>:</dt>
+<dd>URL to the full image. Absolute or relative.</dd>
+</dl>
+<dl class="docutils" id="image2">
+<dt><strong>image</strong>:</dt>
+<dd>URL to the thumbnail. Absolute or relative.</dd>
+</dl>
+<dl class="docutils" id="width">
+<dt><strong>width</strong>:</dt>
+<dd>Size in pixels of the full version of the image. Even if
+you are using a special recursive value in <em>class_type</em> you
+have to specify this attribute.</dd>
+</dl>
+<dl class="docutils" id="height">
+<dt><strong>height</strong>:</dt>
+<dd>Size in pixels of the full version of the image. Even if
+you are using a special recursive value in <em>class_type</em> you
+have to specify this attribute.</dd>
+</dl>
+<dl class="docutils" id="max-zoom">
+<dt><strong>max_zoom</strong> (optional):</dt>
+<dd><p class="first">By default a photo is always centered and scaled to the
+size of the device. And the user can double tap it to zoom
+in. This attribute specifies how much zoom in is performed
+on the double tap. By default is 2, which means doubling
+the image (regardless of its physical size). The minimum
+value for this attribute is 1, which is what you would set
+to disable zooming altogether.</p>
+<p class="last">Depending on the type of images you show, you might want
+to increase or decrease this value. For instance, if you
+want to show panoramic images (4:2 or 5:2) you might want
+to increase the value to let the user zoom in closer than
+the default, which may otherwise leave black bands above/below
+the zoomed content and not get close enough.</p>
+</dd>
+</dl>
+<dl class="docutils" id="caption-text">
+<dt><strong>caption_text</strong> (optional):</dt>
+<dd>Photos can have a caption text. Set this string to the text
+that you want displayed on top of the picture when the user
+touches the screen to show the HUD. If you don't specify
+anything, the caption area won't appear.</dd>
+</dl>
+<dl class="docutils" id="class-type3">
+<dt><strong>class_type</strong> (optional):</dt>
+<dd><p class="first">String with the name of the class that will be used to
+handle the URL. The following are available:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#photo-view-controller">Photo_view_controller</a> (this is the default)</li>
+<li><a class="reference internal" href="#gallery-view-controller">Gallery_view_controller</a></li>
+<li><a class="reference internal" href="#news-view-controller">News_view_controller</a></li>
+<li><a class="reference internal" href="#web-view-controller">Web_view_controller</a></li>
+<li><a class="reference internal" href="#movie-view-controller">Movie_view_controller</a></li>
+</ul>
+<p class="last"><a class="reference internal" href="#photo-view-controller">Photo_view_controller</a> will open the expected image served
+to the client. However, with this attribute you can nest
+different types of content to be opened with other non
+default classes. Nested content will use the data attribute
+which is expected to contain the same set of attributes as
+one of the tab definitions.</p>
+</dd>
+</dl>
+<dl class="docutils" id="data3">
+<dt><strong>data</strong> (optional):</dt>
+<dd>If you are using a <em>class_type</em> other than the default
+value, use this attribute to pack the parameters required
+for the sub controller. See the documentation of the
+controller for the parameters required here.</dd>
+</dl>
+<p>Please note that while you can potentially feed images of any size
+to the iPhone, the SDK restricts images to be of 1024x1024 size,
+which is the biggest that can fit in the device's texture unit.
+Trying to go beyond this size will likely crash the application
+without warning.</p>
+</div>
+<div class="section" id="section-parameters">
+<h2><a class="toc-backref" href="#id18">4.3&nbsp;&nbsp;&nbsp;Section parameters</a></h2>
+<div class="section" id="definition">
+<h3><a class="toc-backref" href="#id19">4.3.1&nbsp;&nbsp;&nbsp;Definition</a></h3>
+<p>Both the <a class="reference internal" href="#news-item-protocol">News item protocol</a> and the <a class="reference internal" href="#gallery-item-protocol">Gallery item protocol</a>
+allow an optional <a class="reference internal" href="#sections">sections</a> block of tags. This common tag specifies
+how elements are to be grouped visually using the <a class="reference internal" href="#section-ids">section_ids</a>
+attribute of each element, which is optional.  Sections themselves
+are just logical grouping elements, but they can optionally show
+an interactive header to show/hide its contents.</p>
+<p>If the news or gallery feed doesn't contain a <a class="reference internal" href="#sections">sections</a> block, the
+<a class="reference internal" href="#section-ids">section_ids</a> attributes of the items are ignored, since they can't
+be used. In this situation, the table of items will be shown as a
+plain list.</p>
+<p>However, if the <a class="reference internal" href="#sections">sections</a> tag exists, <strong>no item will be shown</strong>
+unless it has a <a class="reference internal" href="#section-ids">section_ids</a> attribute with valid existing positive
+integers. In short, if you take a normal feed without <a class="reference internal" href="#section-ids">section_ids</a>
+attributes and create a <a class="reference internal" href="#sections">sections</a> tag, your items will vanish,
+because they won't associate to any section.  This means that once
+you add sections to a feed, everything has to fall into a section,
+or won't be visible to the user, even if it exists and is stored
+to disk cache.</p>
+<p>When you have an interactive section, one which allows itself to
+be collapsed or expanded, the <a class="reference internal" href="#starts-collapsed">starts_collapsed</a> attribute is only
+respected the first time the list is populated, even if the server
+changes the value during the next network fetch, it won't affect
+the user until the application is restarted (or a memory warning
+unloads the tab and the user returns to it).</p>
+<blockquote>
+<div class="line-block">
+<div class="line">sections: [{</div>
+<div class="line-block">
+<div class="line">&quot;<a class="reference internal" href="#id2">id</a>&quot;: int32,</div>
+<div class="line">&quot;<a class="reference internal" href="#sort-id">sort_id</a>&quot;: int64,</div>
+<div class="line">&quot;<a class="reference internal" href="#visible">visible</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#name">name</a>&quot;: string,</div>
+<div class="line">&quot;<a class="reference internal" href="#interactive">interactive</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#starts-collapsed">starts_collapsed</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#autocollapse-others">autocollapse_others</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#hide-if-empty">hide_if_empty</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#show-count">show_count</a>&quot;: bool,</div>
+<div class="line">&quot;<a class="reference internal" href="#collapsed-text-color">collapsed_text_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#collapsed-back-color">collapsed_back_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#expanded-text-color">expanded_text_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a>,</div>
+<div class="line">&quot;<a class="reference internal" href="#expanded-back-color">expanded_back_color</a>&quot;: <a class="reference internal" href="#color-triplet">color_triplet</a></div>
+<div class="line">},</div>
+<div class="line">&lt;repeat block for each section&gt;,</div>
+<div class="line">]</div>
+</div>
+</div>
+</blockquote>
+<dl class="docutils" id="id2">
+<dt><strong>id</strong>:</dt>
+<dd>Positive integer associated to the section. This is the
+number items will refer to with their <a class="reference internal" href="#section-ids">section_ids</a> attributes.
+If two sections contain the same identifier, only the first
+one will be show to the user, duplicated sections are
+discarded.</dd>
+</dl>
+<dl class="docutils" id="visible">
+<dt><strong>visible</strong>:</dt>
+<dd>Boolean that tells if the section's header is visible. If
+the section is not visible, the content will be shown without
+a header. If the section is visible, the header will be
+displayed. Invisible sections ignore all the other parameters
+related to interaction. By default all sections are visible.</dd>
+</dl>
+<dl class="docutils" id="name">
+<dt><strong>name</strong> (optional):</dt>
+<dd>String of text for the section. This is shown to the user
+if the section is visible.</dd>
+</dl>
+<dl class="docutils" id="interactive">
+<dt><strong>interactive</strong> (optional):</dt>
+<dd>Boolean allowing the section to be collapsed or expanded
+by the user tapping on the section header. This attribute
+is ignored if the section is not <a class="reference internal" href="#visible">visible</a>. By default all
+sections are interactive.</dd>
+</dl>
+<dl class="docutils" id="starts-collapsed">
+<dt><strong>starts_collapsed</strong> (optional):</dt>
+<dd>Boolean that specifies if the section starts collapsed or
+not. The attribute is ignored if the section is not <a class="reference internal" href="#visible">visible</a>
+or not <a class="reference internal" href="#interactive">interactive</a>, since an initially collapsed but not
+interactive section would prevent the user to see its
+contents. By default yes.</dd>
+</dl>
+<dl class="docutils" id="autocollapse-others">
+<dt><strong>autocollapse_others</strong> (optional):</dt>
+<dd>When you expand an interactive section, other interactive
+sections can automatically collapse to avoid having a very
+long table in the interface. By default this variable is
+set to true. Setting this to false will expand the touched
+section without collapsing other possibly expanded sections.</dd>
+</dl>
+<dl class="docutils" id="hide-if-empty">
+<dt><strong>hide_if_empty</strong> (optional):</dt>
+<dd>
+<p class="last">Controls whether a visible section should show up even when
+it has no associated items. By default this variable is
+true. Set it to false if you want the user to see the empty
+section header. If an interactive section is empty, expanding
+it will display a basic non interactive cell saying &quot;<em>Hey,
+we are empty, come back later!</em>&quot;:</p>
+</dd>
+</dl>
+<dl class="docutils" id="show-count">
+<dt><strong>show_count</strong> (optional):</dt>
+<dd>By default this attribute is set to false. If you set it
+to true, each section name will be appended the string
+&quot; (%d)&quot; showing the number of items related to the section.
+The count is appended always to the name regardless of
+section state.</dd>
+</dl>
+<dl class="docutils" id="collapsed-text-color">
+<dt><strong>collapsed_text_color</strong> (optional):</dt>
+<dd>Color for the section header text when the section is
+collapsed. By default this inherits whatever color you
+specified in <a class="reference internal" href="#section-collapsed-text-color">section_collapsed_text_color</a>.</dd>
+</dl>
+<dl class="docutils" id="expanded-text-color">
+<dt><strong>expanded_text_color</strong> (optional):</dt>
+<dd>Color for the section header text when the section is
+expanded. By default this inherits whatever color you
+specified in <a class="reference internal" href="#section-expanded-text-color">section_expanded_text_color</a>.</dd>
+</dl>
+<dl class="docutils" id="collapsed-back-color">
+<dt><strong>collapsed_back_color</strong> (optional):</dt>
+<dd>Color for the section header background when the section is
+collapsed. By default this inherits whatever color you
+specified in <a class="reference internal" href="#section-collapsed-back-color">section_collapsed_back_color</a>.</dd>
+</dl>
+<dl class="docutils" id="expanded-back-color">
+<dt><strong>expanded_back_color</strong> (optional):</dt>
+<dd>Color for the section header background when the section is
+expanded. By default this inherits whatever color you
+specified in <a class="reference internal" href="#section-expanded-back-color">section_expanded_back_color</a>.</dd>
+</dl>
+</div>
+<div class="section" id="disk-cache-behaviour">
+<h3><a class="toc-backref" href="#id20">4.3.2&nbsp;&nbsp;&nbsp;Disk cache behaviour</a></h3>
+<p>There are no parameters in the protocols or application definition
+to specify the amount of cached sections. What happens with them?
+The sections are cached as long as there are items referencing them,
+or the server explicitly requests them to show up even if empty.</p>
+</div>
+</div>
+</div>
+<div class="section" id="text-substitutions">
+<h1><a class="toc-backref" href="#id21">5&nbsp;&nbsp;&nbsp;Text substitutions</a></h1>
+<div class="section" id="email-text-substitution">
+<h2><a class="toc-backref" href="#id22">5.1&nbsp;&nbsp;&nbsp;Email text substitution</a></h2>
+<p>When sending email, the subject and body of the email can have
+special strings which will be replaced by content from the application.
+They are:</p>
+<dl class="docutils">
+<dt>&lt;TITLE&gt;:</dt>
+<dd>This string will be replaced by the title used for the item
+entry.</dd>
+<dt>&lt;URL&gt;:</dt>
+<dd>This string will be replaced by the shared URL attribute
+for the item entry.</dd>
+<dt>&lt;PHOTO_DESC&gt;:</dt>
+<dd>This string will be replaced by the caption_text attribute
+of the <a class="reference internal" href="#gallery-item-protocol">Gallery item protocol</a>. Since this attribute is
+optional, if not preset the tag will be replaced by the
+empty string.</dd>
+</dl>
+</div>
+<div class="section" id="search-url-substitution">
+<h2><a class="toc-backref" href="#id23">5.2&nbsp;&nbsp;&nbsp;Search URL substitution</a></h2>
+<p>As specified by the news tab <a class="reference internal" href="#search-bar">search_bar</a> parameter, for the URL to
+work it needs to have parts of itself replaced. These are the
+substrings you can use:</p>
+<dl class="docutils">
+<dt>_LNG_:</dt>
+<dd>This optional substring will be replaced by the language
+langcode of the user. If it is not present nothing happens.</dd>
+<dt>_WORDS_:</dt>
+<dd>The part of the URL where words will be embedded. Mandatory.
+The text will be replaced by the urlencoded version of the
+user input. If this tag is not found in the <a class="reference internal" href="#search-bar">search_bar</a>
+parameter, the whole URL will be ignored.</dd>
+<dt>_PAGE_:</dt>
+<dd>The part of the URL specifying the results page. The search
+is expected to return results in chunks. The page requests
+start with 1, and the client will never ask for page <strong>N</strong>
+without requesting previously <strong>N - 1</strong>. If this tag is not
+found in the <a class="reference internal" href="#search-bar">search_bar</a> parameter, the whole URL will be
+ignored. This replacement substring is ignored and not
+required for other similar parameters like <a class="reference internal" href="#videos-url">videos_url</a> or
+gallery_url which dont't feature paging.</dd>
+</dl>
+<p>The client doesn't care about the size of each page returned by the search URL,
+so the server is free to return any number of results for each page. As long as
+the server returns anything, the client will keep displaying a cell to request
+more. If the server returns an empty set, the client will presume there are no
+more pages.</p>
+</div>
+</div>
+<div class="section" id="debug-switches">
+<h1><a class="toc-backref" href="#id24">6&nbsp;&nbsp;&nbsp;Debug switches</a></h1>
+<p>There are several debug switches that are available on internal builds which
+may help developing the application. These are:</p>
+<dl class="docutils">
+<dt><strong>Host</strong>:</dt>
+<dd>To avoid having many binaries, the internal debug version
+allows changing the server it fetches data from through a
+simple list. This also allows easy checking of backwards
+compatibility against previous already deployed applications.
+Pick the server you want and don't look back!</dd>
+</dl>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2012-01-18 14:31 UTC.
+
+</div>
+</body>
+</html>

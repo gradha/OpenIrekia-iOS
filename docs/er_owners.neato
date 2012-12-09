@@ -1,0 +1,23 @@
+graph ER {
+	node [shape=box]; Owners;
+	node [shape=ellipse]; {node [label="id"] Owners_id; }
+	node [shape=ellipse]; {node [label="name"] Owners_name; }
+	node [shape=ellipse]; {node [label="last_updated"] Owners_last_updated; }
+
+	Owners -- Owners_id
+	Owners -- Owners_name
+	Owners -- Owners_last_updated
+
+	node [shape=box]; Sections;
+	node [shape=ellipse]; {node [label="id"] Sections_id; }
+	node [shape=ellipse]; {node [label="owner"] Sections_owner; }
+	node [shape=ellipse]; {node [label="size"] Sections_size; }
+	node [shape=ellipse]; {node [label="data"] Sections_data; }
+
+	Sections -- Sections_id
+	Sections -- Sections_owner
+	Sections -- Sections_size
+	Sections -- Sections_data
+
+	Owners -- Sections
+}

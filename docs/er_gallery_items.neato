@@ -1,0 +1,45 @@
+graph ER {
+	node [shape=box]; Owners;
+
+	node [shape=box]; Gallery_items;
+	node [shape=ellipse]; {node [label="id"] Gallery_items_id; }
+	node [shape=ellipse]; {node [label="owner"] Gallery_items_owner; }
+	node [shape=ellipse]; {node [label="size"] Gallery_items_size; }
+	node [shape=ellipse]; {node [label="data"] Gallery_items_data; }
+
+	Gallery_items -- Gallery_items_id
+	Gallery_items -- Gallery_items_owner
+	Gallery_items -- Gallery_items_size
+	Gallery_items -- Gallery_items_data
+
+	node [shape=box]; Gallery_thumbs;
+	node [shape=ellipse]; {node [label="id"] Gallery_thumbs_id; }
+	node [shape=ellipse]; {node [label="owner"] Gallery_thumbs_owner; }
+	node [shape=ellipse]; {node [label="url"] Gallery_thumbs_url; }
+	node [shape=ellipse]; {node [label="size"] Gallery_thumbs_size; }
+	node [shape=ellipse]; {node [label="data"] Gallery_thumbs_data; }
+
+	Gallery_thumbs -- Gallery_thumbs_id
+	Gallery_thumbs -- Gallery_thumbs_owner
+	Gallery_thumbs -- Gallery_thumbs_url
+	Gallery_thumbs -- Gallery_thumbs_size
+	Gallery_thumbs -- Gallery_thumbs_data
+
+	node [shape=box]; Gallery_images;
+	node [shape=ellipse]; {node [label="id"] Gallery_images_id; }
+	node [shape=ellipse]; {node [label="owner"] Gallery_images_owner; }
+	node [shape=ellipse]; {node [label="url"] Gallery_images_url; }
+	node [shape=ellipse]; {node [label="size"] Gallery_images_size; }
+	node [shape=ellipse]; {node [label="data"] Gallery_images_data; }
+
+	Gallery_images -- Gallery_images_id
+	Gallery_images -- Gallery_images_owner
+	Gallery_images -- Gallery_images_url
+	Gallery_images -- Gallery_images_size
+	Gallery_images -- Gallery_images_data
+
+	Gallery_images -- Owners
+	Gallery_thumbs -- Owners
+	Gallery_items -- Owners
+}
+

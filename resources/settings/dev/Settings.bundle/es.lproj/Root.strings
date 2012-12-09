@@ -1,0 +1,10 @@
+/*
+   Root.strings
+   Floki
+ */
+"Language" = "Idioma";
+"System" = "Sistema";
+"Cache size" = "Tamaño caché";
+"For next launch only:" = "Sólo para el siguiente inicio:";
+"Clear cache" = "Borrar caché";
+"Version" = "Versión";
