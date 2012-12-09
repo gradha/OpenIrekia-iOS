@@ -12,6 +12,8 @@ made for Github. You can also read the [original README
 here](https://github.com/gradha/OpenIrekia-iOS/blob/master/README) or see a
 table of released versions at
 [http://gradha.github.com/OpenIrekia-iOS/](http://gradha.github.com/OpenIrekia-iOS/).
+You can [https://itunes.apple.com/es/app/irekia/id383327242?mt=8](download the
+iOS version from the App Store).
 
 Compilation
 -----------
