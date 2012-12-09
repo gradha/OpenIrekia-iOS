@@ -4,8 +4,8 @@ Open Irekia for iOS
 As part of the [Open Irekia project](http://open.irekia.net), the Basque
 Government has released under the
 [EUPL](http://joinup.ec.europa.eu/software/page/eupl) bits of free software.
-This is an unofficial mirror of the software releases for the iOS mobile
-client, which works on iOS and iPad.
+This is an unofficial mirror of the software releases for the Open IrekiaiOS
+mobile client, which works on iOS and iPad.
 
 The github repo contains just the files released plus this additional readme
 made for Github. You can also read the [original README
