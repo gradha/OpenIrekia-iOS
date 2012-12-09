@@ -8,7 +8,8 @@ bits of free software. This is an unofficial mirror of the software releases
 for the iOS mobile client, which works on iOS and iPad.
 
 The github repo contains just the files released plus this additional readme
-made for Github. You can also read the [original README here](README).
+made for Github. You can also read the [original README
+here](https://github.com/gradha/OpenIrekia-iOS/blob/master/README).
 
 Compilation
 -----------
